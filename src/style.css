@@ -142,7 +142,7 @@ main,
 .card {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
 }
 
 
@@ -1654,6 +1654,7 @@ main,
     align-items: center;
     gap: 12px;
     height: 60px;
+    margin-top: 14px;
     font-family: "SB Sans Display Semibold", sans-serif;
     font-size: 16px;
     padding: 0 6px 6px;
