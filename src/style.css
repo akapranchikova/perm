@@ -1527,7 +1527,7 @@ main,
 .content-header__title {
     font-size: 20px;
     font-family: "SB Sans Display Semibold", sans-serif;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .content-header__close {
@@ -1897,7 +1897,7 @@ main,
     background: #ffffff;
     border-radius: 0 0 18px 18px;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 .content-card__title {
