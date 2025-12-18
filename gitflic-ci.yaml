@@ -1,0 +1,17 @@
+stages:
+  - deploy
+
+deploy_dev:
+  stage: deploy
+  script:
+    - npm ci
+    - npm run build
+    - rm -rf /var/www/permistoriyamesta.ru/*
+    - cp -r ./dist/* /var/www/permistoriyamesta.ru
+  only:
+    - main
+
+cache:
+  key: npm-cache
+  paths:
+    - node_modules/

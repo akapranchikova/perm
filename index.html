@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+      <script type="text/javascript">
+          (function(m,e,t,r,i,k,a){
+              m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+              m[i].l=1*new Date();
+              for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+              k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+          })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=105888770', 'ym');
+
+          ym(105888770, 'init', {ssr:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
+      </script>
+
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+      <title>История места. Интерактивная экскурсия</title>
+
+      <meta name="description" content="Ваш гид от ГигаЧат, который проведёт через историю Перми от пермского периода до сегодняшнего дня." />
+
+      <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=SB+Sans+Display:wght@400;600;700&display=swap"
+    />
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  <script>
+      // Disable pinch-zoom + double-tap zoom (iOS Safari safe-ish)
+      let lastTouchEnd = 0;
+
+      document.addEventListener(
+          'touchstart',
+          (e) => {
+              // Pinch: 2+ fingers
+              if (e.touches.length > 1) e.preventDefault();
+          },
+          { passive: false }
+      );
+
+      document.addEventListener(
+          'touchmove',
+          (e) => {
+              // Some iOS versions pinch during move
+              if (e.touches.length > 1) e.preventDefault();
+          },
+          { passive: false }
+      );
+
+      document.addEventListener(
+          'touchend',
+          (e) => {
+              // Double tap
+              const now = Date.now();
+              if (now - lastTouchEnd <= 300) e.preventDefault();
+              lastTouchEnd = now;
+          },
+          { passive: false }
+      );
+  </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/105888770" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+  </body>
+</html>
