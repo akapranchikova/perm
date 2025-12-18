@@ -680,7 +680,6 @@ export const renderGuideIntro = (): RenderResult => {
         })
 
     const showFinalCue = () => {
-        console.log('show filen clue', !introSubtitles.length)
         if (!introSubtitles.length) return
 
         const lastCueIndex = introSubtitles.length - 1
@@ -756,6 +755,7 @@ export const renderGuideIntro = (): RenderResult => {
     setSubtitles(introSubtitles)
 
     const startRoute = () => {
+        document.removeEventListener('visibilitychange', onVisibility)
         if (isRouteCompleted()) {
             resetProgress()
         }
