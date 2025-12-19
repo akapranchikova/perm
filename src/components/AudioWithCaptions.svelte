@@ -51,7 +51,7 @@
   onDestroy(() => stopLoop());
 </script>
 
-<audio bind:this={audio} playsinline></audio>
+<audio bind:this={audio} playsinline />
 
 {#if current}
   <div class="captions" aria-live="polite">{current}</div>

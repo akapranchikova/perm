@@ -6,12 +6,13 @@
     type Caption = { t: number; text: string };
     type Slide = {
         id: string;
-        title: string;
+        title?: string;
         description?: string;
         imageScr?: string;
         imageClass?: string;
         showRing?: boolean;
         background?: string;
+        background2?: string;
         primaryLabel: string;
         primaryAction?: SlideAction;
         secondaryLabel?: string;
@@ -67,9 +68,7 @@
         },
         {
             id: 'audio-welcome',
-            title:
-                'Приветствуем на выставке «Поленов и ученики»! Мы, AI-гиды Сбера расскажем о наследии Поленова',
-            background: '/guides.png',
+            background2: '/images/onboarding-couple.png',
             primaryLabel: 'Далее',
             primaryAction: 'next',
             audio: {
@@ -85,7 +84,6 @@
         },
         {
             id: 'audio-journey',
-            title: 'Поленов и ученики – это погружение в творчество великого русского художника сквозь его отражение',
             background: '/images/background2.png',
             primaryLabel: 'Начать',
             primaryAction: 'start',
@@ -132,7 +130,7 @@
 
 <div
         class="onboarding-screen"
-        style={`--screen-bg: url('${slides[current]?.background ?? '/images/background1.png'}');`}
+        style={`--screen-bg: url('${slides[current]?.background ?? '/images/background1.png'}'); --screen-bg2: ${slides[current]?.background2 ? 'url(\'' +slides[current]?.background2 + '\')': 'transparent'};`}
 >
     <div class="top-gradient"></div>
 
@@ -156,19 +154,32 @@
         {/if}
     </header>
 
-    {#if slides[current]?.imageScr}
-        <div class="hero">
-            {#if slides[current]?.showRing}
-                <div class="hero-ring"></div>
+    <div class="main-block">
+        {#if slides[current]?.imageScr}
+            <div class="hero {slides[current]?.showRing ? 'hero-ring' : ''}">
+                <!--{#if slides[current]?.showRing}-->
+<!--                    <div class="hero-ring"></div>-->
+<!--                {/if}-->
+                <img
+                        src={slides[current].imageScr}
+                        alt={slides[current].title}
+                        class={slides[current].imageClass}
+                />
+                <div class="hero-blur"></div>
+            </div>
+        {/if}
+
+        <div class="text-block">
+            {#if slides[current].title}
+                <h2>{slides[current].title}</h2>
             {/if}
-            <img
-                    src={slides[current].imageScr}
-                    alt={slides[current].title}
-                    class={slides[current].imageClass}
-            />
-            <div class="hero-blur"></div>
+
+            {#if slides[current].description}
+                <p>{slides[current].description}</p>
+            {/if}
         </div>
-    {/if}
+    </div>
+
 
     {#if slides[current]?.audio}
         <div class="audioLayer">
@@ -182,12 +193,7 @@
     {/if}
 
     <div class={`content-card ${slides[current]?.audio ? 'content-card--audio' : ''}`}>
-        <div class="text-block">
-            <h2>{slides[current].title}</h2>
-            {#if slides[current].description}
-                <p>{slides[current].description}</p>
-            {/if}
-        </div>
+
 
         <div class="buttons">
             {#if slides[current]?.secondaryLabel}
@@ -225,7 +231,23 @@
         height: 100%;
         overflow: hidden;
         color: #18160f;
-        background: #18160f var(--screen-bg) center/cover no-repeat;
+        background: var(--screen-bg) center/cover no-repeat;
+    }
+
+    .onboarding-screen::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.60);
+        pointer-events: none;
+    }
+
+    .onboarding-screen::after {
+        position: absolute;
+        content: '';
+        width: 100%;
+        height: 100%;
+        background: var(--screen-bg2) center/cover no-repeat;
     }
 
     .top-gradient,
@@ -326,22 +348,37 @@
         opacity: 0.85;
     }
 
-    .hero {
+    .main-block {
         position: absolute;
         top: 130px;
         left: 50%;
         transform: translateX(-50%);
-        width: 220px;
-        height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 25px;
+        width: 100%;
+        padding: 30px;
+    }
+
+    .hero {
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 2;
+        width: fit-content;
+        position: relative;
     }
 
-    .hero-ring {
+    .hero-ring::before {
+        content: '';
         position: absolute;
         inset: 0;
+        top: -6px;
+        left: -6px;
+        bottom: -6px;
+        right: -6px;
         border: 1.5px solid rgba(178, 152, 126, 0.7);
         border-radius: 50%;
         pointer-events: none;
@@ -370,10 +407,10 @@
 
     .hero-blur {
         position: absolute;
-        width: 420px;
-        height: 380px;
-        left: 50%;
-        top: 110px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        top: 0;
         transform: translateX(-50%);
         background: #ffffff;
         filter: blur(90px);
@@ -391,7 +428,6 @@
         flex-direction: column;
         gap: 18px;
         z-index: 2;
-        background: linear-gradient(180deg, rgba(16, 13, 10, 0) 0%, rgba(16, 13, 10, 0.8) 38%, rgba(16, 13, 10, 0.9) 100%);
     }
 
     .content-card--audio {
@@ -402,24 +438,23 @@
         text-align: center;
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        color: #fefefc;
+        gap: 24px;
     }
 
-    .content-card h2 {
+    .main-block h2 {
         margin: 0;
         font-family: 'Prata', 'Times New Roman', serif;
-        font-size: 26px;
+        font-size: 32px;
+        color: rgba(24, 22, 15, 1);
         line-height: 1.2;
-        text-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
     }
 
-    .content-card p {
+    .main-block p {
         margin: 0;
         font-size: 16px;
         line-height: 1.35;
-        color: rgba(254, 254, 252, 0.9);
-        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+        color: rgba(24, 22, 15, 1);
+
     }
 
     .buttons {
@@ -434,16 +469,12 @@
         height: 51px;
         border-radius: 100px;
         font-size: 16px;
-        font-weight: 600;
+        font-weight: 400;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
-    }
-
-    .cta-button:active {
-        transform: translateY(1px);
     }
 
     .cta-button.primary {
@@ -475,14 +506,15 @@
     .onboarding-screen :global(.captions) {
         left: 20px;
         right: 20px;
-        bottom: 120px;
-        background: rgba(16, 13, 10, 0.75);
+        bottom: 90px;
         color: rgba(254, 254, 252, 0.96);
-        border: 1px solid rgba(254, 254, 252, 0.1);
         text-align: center;
-        line-height: 1.35;
-        font-size: 14px;
-        backdrop-filter: blur(16px);
+        line-height: 1.24;
+        font-size: 18px;
+        font-family: "Inter", sans-serif;
+        backdrop-filter: none;
+        background: transparent;
+        border: none;
     }
 
     @media (min-width: 480px) {

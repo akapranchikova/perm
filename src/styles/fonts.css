@@ -1,4 +1,12 @@
 @font-face {
+  font-family: 'Prata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Prata-Regular.ttf')
+       format('truetype');
+}
+@font-face {
   font-family: 'Inter';
   font-style: normal;
   font-weight: 400;
