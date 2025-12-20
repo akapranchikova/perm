@@ -4,6 +4,7 @@
   import Modal from '../components/Modal.svelte';
   import AudioWithCaptions from '../components/AudioWithCaptions.svelte';
   import XR8Scene from './XR8Scene.svelte';
+  import ActivityShell from '../components/ActivityShell.svelte';
   import { getArtifactForActivity } from '../data/artifacts';
 
   // шаги
@@ -14,6 +15,16 @@
   });
 
   let step = steps.INTRO;
+
+  const intro = {
+    title: "Приветственный адрес Поленову от учеников",
+    description:
+      "Документ, в котором звучат голоса учеников Василия Дмитриевича. В 1895 году, прощаясь с преподавателем, они написали ему приветственный адрес — слова благодарности",
+    imageUrl: "/activityB/background.png",
+    imageAlt: "Приветственный адрес Поленову от учеников",
+    floorLabel: "1 этаж",
+    buttonText: "Начать",
+  };
 
   // индекс текущего воспоминания (0..n-1)
   let idx = 0;
@@ -51,80 +62,82 @@
   }
 </script>
 
-<div class="safe activityB">
+<ActivityShell {intro}>
+  <div class="safe activityB">
 
-  <!-- XR слой (fixed) — показываем только когда step === AR -->
-  <XR8Scene running={step === steps.AR} on:pagetap={onPageTap} />
+    <!-- XR слой (fixed) — показываем только когда step === AR -->
+    <XR8Scene running={step === steps.AR} on:pagetap={onPageTap} />
 
-  {#if step === steps.INTRO}
-    <div class="intro">
-      <div class="introArt" aria-hidden="true">
-        <img src="/activityB/background.png" alt="Back"/>
-        <div class="circle"></div>
-      </div>
+    {#if step === steps.INTRO}
+      <div class="intro">
+        <div class="introArt" aria-hidden="true">
+          <img src="/activityB/background.png" alt="Back"/>
+          <div class="circle"></div>
+        </div>
 
-      <div class="card introCard">
-        <div class="introText">
-          Поймай страницу и узнай воспоминания от самых выдающихся учеников мастера
+        <div class="card introCard">
+          <div class="introText">
+            Поймай страницу и узнай воспоминания от самых выдающихся учеников мастера
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="btn-primary" type="button" on:click={startAR}>Начать</button>
+          <button class="btn-outline" type="button" on:click={finish}>Завершить</button>
         </div>
       </div>
+    {/if}
 
-      <div class="btns">
-        <button class="btn-primary" type="button" on:click={startAR}>Начать</button>
-        <button class="btn-outline" type="button" on:click={finish}>Завершить</button>
-      </div>
-    </div>
-  {/if}
-
-  {#if step === steps.DETAIL}
-    <div class="detail">
-      <div class="top">
-        <div>
-          <div class="name">{memo.name}</div>
-          <div class="role">{memo.role}</div>
+    {#if step === steps.DETAIL}
+      <div class="detail">
+        <div class="top">
+          <div>
+            <div class="name">{memo.name}</div>
+            <div class="role">{memo.role}</div>
+          </div>
+          <button class="icon" type="button" aria-label="Звук (мьют)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M11 5L6.5 9H3v6h3.5L11 19V5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M16 9c1.5 1.5 1.5 4.5 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
         </div>
-        <button class="icon" type="button" aria-label="Звук (мьют)">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M11 5L6.5 9H3v6h3.5L11 19V5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-            <path d="M16 9c1.5 1.5 1.5 4.5 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
+
+        <div class="card portraitCard">
+          <img class="portrait" src={memo.portraitUrl} alt="Портрет" />
+        </div>
+
+        <div class="excerpt">{memo.excerpt}</div>
+
+        <!-- аудио + субтитры -->
+        <div class="audioLayer">
+          <AudioWithCaptions src={memo.audioUrl} captions={memo.captions} autoplay={true} />
+        </div>
+
+        <div class="btns" style="margin-top: 12px;">
+          <button class="btn-outline" type="button" on:click={() => (modalOpen = true)}>
+            Прочитать воспоминание
+          </button>
+          <button class="btn-primary" type="button" on:click={nextMemory}>
+            Поймать другое
+          </button>
+          <button class="btn-outline" type="button" on:click={backToAR}>
+            Вернуться в AR
+          </button>
+        </div>
+
+        <div class="footerRow">
+          <button class="link" type="button" on:click={finish}>Завершить активность</button>
+        </div>
+
+        <Modal open={modalOpen} title={memo.name} onClose={() => (modalOpen = false)}>
+          <div class="modalRole">{memo.role}</div>
+          <div class="modalText">{memo.fullText}</div>
+        </Modal>
       </div>
-
-      <div class="card portraitCard">
-        <img class="portrait" src={memo.portraitUrl} alt="Портрет" />
-      </div>
-
-      <div class="excerpt">{memo.excerpt}</div>
-
-      <!-- аудио + субтитры -->
-      <div class="audioLayer">
-        <AudioWithCaptions src={memo.audioUrl} captions={memo.captions} autoplay={true} />
-      </div>
-
-      <div class="btns" style="margin-top: 12px;">
-        <button class="btn-outline" type="button" on:click={() => (modalOpen = true)}>
-          Прочитать воспоминание
-        </button>
-        <button class="btn-primary" type="button" on:click={nextMemory}>
-          Поймать другое
-        </button>
-        <button class="btn-outline" type="button" on:click={backToAR}>
-          Вернуться в AR
-        </button>
-      </div>
-
-      <div class="footerRow">
-        <button class="link" type="button" on:click={finish}>Завершить активность</button>
-      </div>
-
-      <Modal open={modalOpen} title={memo.name} onClose={() => (modalOpen = false)}>
-        <div class="modalRole">{memo.role}</div>
-        <div class="modalText">{memo.fullText}</div>
-      </Modal>
-    </div>
-  {/if}
-</div>
+    {/if}
+  </div>
+</ActivityShell>
 
 <style>
   .activityB{

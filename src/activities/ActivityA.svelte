@@ -31,17 +31,16 @@
     router.go(routes.ARTIFACT_REWARD, { artifactId: artifact?.id });
   }
 
-  // Props для ActivityShell
-  let intro = $state({
-    title: 'Подводка от учеников',
-    imageUrl: 'guides.png',
-    textLines: [
-      'которые когда-то закладывал',
-      'Василий Дмитриевич Поленов.',
-      'Мы изучаем его наследие и'
-    ],
-    buttonText: 'Далее'
-  });
+  const intro = {
+    title: "Пастух со стадом",
+    subtitle: "Егише Татевосян",
+    description:
+      "Картина показывает тихую сцену деревенской жизни. В работе заметно, как художник играет со светом и тенью, следуя урокам Поленова, мастерски передает атмосферу и глубину пейзажа",
+    imageUrl: "/activityA/frame_0003.png",
+    imageAlt: "Пастух со стадом — Егише Татевосян",
+    floorLabel: "2 этаж",
+    buttonText: "Начать",
+  };
 
   function handleValueChanged(newValue) {
     value = newValue;

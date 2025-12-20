@@ -11,8 +11,8 @@
   const items = [
     { id: routes.ACTIVITY_A, title: 'Пастух со стадом', desc: 'Егише Татевосян', image: '/activityA/frame_0003.png', floor: 2 },
     { id: routes.ACTIVITY_B, title: 'Приветственный адрес Поленову от учеников', desc: null, image: '/activityB/background.png', floor: 1 },
-    { id: routes.ACTIVITY_C, title: 'Активность C', desc: null, image: '/painting.png', floor: 1 },
-    { id: routes.ACTIVITY_D, title: 'Настурции', desc: 'Константин Коровин', image: '/activityE/map.png', floor: 2 },
+    { id: routes.ACTIVITY_C, title: 'Музыкальная рукопись «Анна Бретонская»', desc: 'Василий Поленов', image: '/painting.png', floor: 1 },
+    { id: routes.ACTIVITY_D, title: 'Настурции', desc: 'Константин Коровин', image: '/painting-d.png', floor: 2 },
     { id: routes.ACTIVITY_E, title: 'Альбом с фотографиями из восточной поездки', desc: 'Леонид Кандауров', image: '/guides.png', floor: 2 }
   ];
 
@@ -20,6 +20,11 @@
     { label: '1 этаж', value: 1 },
     { label: '2 этаж', value: 2 }
   ];
+
+  const floorMaps = {
+    1: '/images/floor-1.svg',
+    2: '/images/floor-2.svg'
+  };
 
   let viewMode = 'list';
 </script>
@@ -81,11 +86,15 @@
         {/each}
       </div>
     {:else}
-      <div class="placeholder">
-        <p class="activity-title">Карта появится позже</p>
-        <p class="activity-desc">
-          Сейчас доступен список активностей. Вы можете включить аудио: {#if $settings.audioEnabled}включено{:else}выкл{/if}.
-        </p>
+      <div class="maps">
+        {#each floors as floor}
+          <div class="floor map-floor">
+            <p class="floor-label">{floor.label}</p>
+            <div class="map-image">
+              <img src={floorMaps[floor.value]} alt={`Карта ${floor.label}`} loading="lazy" />
+            </div>
+          </div>
+        {/each}
       </div>
     {/if}
   </section>
@@ -154,6 +163,7 @@
     border-radius: 28px 28px 0 0;
     padding: clamp(16px, 4vw, 20px);
     display: flex;
+      overflow-y: auto;
     flex-direction: column;
     gap: clamp(18px, 4vw, 24px);
     box-shadow: 0 -8px 24px rgba(24, 22, 15, 0.08);
@@ -194,9 +204,19 @@
     gap: clamp(18px, 4vw, 26px);
   }
 
+  .maps {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(18px, 4vw, 26px);
+  }
+
   .floor {
     display: flex;
     flex-direction: column;
+  }
+
+  .map-floor {
+    gap: clamp(12px, 3vw, 16px);
   }
 
   .floor-label {
@@ -269,5 +289,17 @@
     background: rgba(243, 237, 227, 0.7);
     border-radius: 18px;
     padding: clamp(14px, 3.5vw, 18px);
+  }
+
+  .map-image {
+    padding: clamp(12px, 3vw, 16px);
+    display: grid;
+    place-items: center;
+  }
+
+  .map-image img {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 </style>

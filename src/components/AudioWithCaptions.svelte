@@ -61,14 +61,14 @@
   .captions{
     position: absolute;
     left: 16px; right: 16px;
-    bottom: 110px;
-    background: rgba(17,24,39,0.55);
-    color: rgba(255,255,255,0.95);
+    bottom: 90px;
     padding: 10px 12px;
     border-radius: 14px;
-    font-size: 13px;
-    line-height: 1.25;
-    backdrop-filter: blur(8px);
-    text-align: center;
+      color: rgba(254, 254, 252, 0.96);
+      text-align: center;
+      line-height: 1.24;
+      font-size: 18px;
+      font-family: "Inter", sans-serif;
+      backdrop-filter: none;
   }
 </style>

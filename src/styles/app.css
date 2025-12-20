@@ -9,21 +9,27 @@
 }
 
 *{ box-sizing: border-box; }
-html, body { height: 100%; }
+html, body {
+  height: 100%;
+}
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   background: #111;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 .phone {
   width: max(320px, 100vw);
-  height: max(660px, 100vh);
+  height: 100svh;
+  min-height: 100vh;
   margin: 0 auto;
   background: var(--bg);
   color: var(--text);
   display:flex;
   flex-direction:column;
+  overflow: hidden;
 }
 
 .safe {

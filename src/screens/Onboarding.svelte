@@ -155,7 +155,7 @@
 </script>
 
 <div
-        class="onboarding-screen"
+        class="onboarding-screen onboarding-screen-{current + 1}"
         style={`--screen-bg: url('${slides[current]?.background ?? '/images/background1.png'}'); --screen-bg2: ${slides[current]?.background2 ? 'url(\'' +slides[current]?.background2 + '\')': 'transparent'};`}
 >
     <div class="top-gradient"></div>
@@ -269,18 +269,26 @@
     .onboarding-screen {
         position: relative;
         width: 100%;
-        height: 100%;
+        min-height: 100svh;
         overflow: hidden;
         color: #18160f;
         background: var(--screen-bg) center/cover no-repeat;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        gap: clamp(18px, 4vw, 28px);
+        box-sizing: border-box;
     }
 
     .onboarding-screen::before {
         content: '';
         position: absolute;
         inset: 0;
-        background: rgba(255, 255, 255, 0.60);
+        background: rgba(255, 255, 255, 0.50);
         pointer-events: none;
+    }
+    .onboarding-screen-6::before {
+        background: transparent;
     }
 
     .onboarding-screen::after {
@@ -302,25 +310,23 @@
 
     .top-gradient {
         top: 0;
-        height: 210px;
+        height: clamp(150px, 28vh, 210px);
         background: linear-gradient(180deg, rgba(16, 13, 10, 0.85) 0%, rgba(16, 13, 10, 0.25) 70%, transparent 100%);
     }
 
     .bottom-gradient {
         bottom: 0;
-        height: 340px;
+        height: clamp(240px, 42vh, 340px);
         background: linear-gradient(180deg, rgba(16, 13, 10, 0) 0%, rgba(16, 13, 10, 0.8) 100%);
     }
 
     .top-container {
-        position: absolute;
-        top: 48px;
-        left: 20px;
-        right: 20px;
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: space-between;
         z-index: 3;
+        padding: 0 clamp(2px, 1vw, 4px);
     }
 
     .logo-group {
@@ -390,17 +396,16 @@
     }
 
     .main-block {
-        position: absolute;
-        top: 130px;
-        left: 50%;
-        transform: translateX(-50%);
+        position: relative;
+        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 25px;
+        gap: clamp(16px, 4vw, 26px);
         width: 100%;
-        padding: 30px;
+        padding: clamp(16px, 4vw, 26px);
+        box-sizing: border-box;
     }
 
     .hero {
@@ -426,15 +431,15 @@
     }
 
     .hero-img {
-        width: 200px;
-        height: 200px;
+        width: clamp(156px, 38vw, 210px);
+        height: clamp(156px, 38vw, 210px);
         border-radius: 50%;
         object-fit: cover;
     }
 
     .guides-img {
-        width: 320px;
-        height: 240px;
+        width: clamp(230px, 70vw, 320px);
+        height: clamp(170px, 56vw, 240px);
         object-fit: contain;
     }
 
@@ -444,8 +449,8 @@
 
     .collage {
         position: relative;
-        width: 100vw;
-        height: 220px;
+        width: min(100%, 420px);
+        height: clamp(180px, 44vw, 230px);
         margin: 0 auto;
     }
 
@@ -465,27 +470,27 @@
     }
 
     .collage-card--left {
-        width: 182px;
-        height: 140px;
-        top: 56px;
+        width: clamp(150px, 48vw, 182px);
+        height: clamp(120px, 36vw, 140px);
+        top: clamp(32px, 10vw, 56px);
         z-index: 3;
-        left: -20%;
+        left: clamp(-12%, -6vw, -4%);
         transform: rotate(-8deg);
     }
 
     .collage-card--center {
-        width: 230px;
-        height: 150px;
-        top: -4px;
-        left: 48px;
+        width: clamp(186px, 54vw, 230px);
+        height: clamp(132px, 38vw, 150px);
+        top: clamp(-10px, 2vw, -2px);
+        left: clamp(16px, 10vw, 48px);
         transform: rotate(3deg);
     }
 
     .collage-card--right {
-        width: 176px;
-        height: 140px;
-        top: 40px;
-        right: -10%;
+        width: clamp(150px, 44vw, 176px);
+        height: clamp(120px, 36vw, 140px);
+        top: clamp(24px, 9vw, 40px);
+        right: clamp(-8%, -3vw, 0%);
         transform: rotate(8deg);
     }
 
@@ -531,39 +536,38 @@
     }
 
     .content-card {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        padding: 46px 20px 32px;
+        position: relative;
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        gap: clamp(14px, 4vw, 22px);
         z-index: 2;
+        margin-top: auto;
+        box-sizing: border-box;
     }
 
     .content-card--audio {
-        padding-top: 140px;
+        padding-top: clamp(96px, 22vw, 140px);
     }
 
     .text-block {
         text-align: center;
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: clamp(16px, 4vw, 24px);
+        max-width: 520px;
     }
 
     .main-block h2 {
         margin: 0;
         font-family: 'Prata', 'Times New Roman', serif;
-        font-size: 32px;
+        font-size: clamp(26px, 6vw, 32px);
         color: rgba(24, 22, 15, 1);
         line-height: 1.2;
     }
 
     .main-block p {
         margin: 0;
-        font-size: 16px;
+        font-size: clamp(14px, 3.5vw, 16px);
         line-height: 1.35;
         color: rgba(24, 22, 15, 1);
 
@@ -572,15 +576,15 @@
     .buttons {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: clamp(10px, 3vw, 14px);
         width: 100%;
     }
 
     .cta-button {
         width: 100%;
-        height: 51px;
+        min-height: clamp(46px, 10vw, 54px);
         border-radius: 100px;
-        font-size: 16px;
+        font-size: clamp(15px, 3.6vw, 16px);
         font-weight: 400;
         display: flex;
         align-items: center;
