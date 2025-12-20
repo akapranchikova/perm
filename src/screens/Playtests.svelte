@@ -3,17 +3,17 @@
   import { settings } from '../stores/settings';
 
   const hero = {
-    lead: '/avatar.png',
-    badge: '/guide.png',
+    lead: '/guide.png',
+    badge: '/book.png',
     text: 'Изучайте экспонаты, отмеченные на карте, и наполняйте путевой дневник артефактами'
   };
 
   const items = [
-    { id: routes.ACTIVITY_A, title: 'Активность A', desc: null, image: '/activityA/frame_0003.png', floor: 1 },
-    { id: routes.ACTIVITY_B, title: 'Активность B', desc: 'Ловить письма', image: '/activityB/background.png', floor: 1 },
+    { id: routes.ACTIVITY_A, title: 'Пастух со стадом', desc: 'Егише Татевосян', image: '/activityA/frame_0003.png', floor: 2 },
+    { id: routes.ACTIVITY_B, title: 'Приветственный адрес Поленову от учеников', desc: null, image: '/activityB/background.png', floor: 1 },
     { id: routes.ACTIVITY_C, title: 'Активность C', desc: null, image: '/painting.png', floor: 1 },
-    { id: routes.ACTIVITY_D, title: 'Активность D', desc: 'Зум картины → тап по зоне → квиз', image: '/activityE/map.png', floor: 2 },
-    { id: routes.ACTIVITY_E, title: 'Активность E', desc: 'Карта и что-то там', image: '/guides.png', floor: 2 }
+    { id: routes.ACTIVITY_D, title: 'Настурции', desc: 'Константин Коровин', image: '/activityE/map.png', floor: 2 },
+    { id: routes.ACTIVITY_E, title: 'Альбом с фотографиями из восточной поездки', desc: 'Леонид Кандауров', image: '/guides.png', floor: 2 }
   ];
 
   const floors = [
@@ -31,9 +31,9 @@
         <img src={hero.lead} alt="Гид" loading="lazy" />
       </div>
       <p class="hero-text">{hero.text}</p>
-      <div class="circle">
+      <button class="circle action" type="button" on:click={() => router.go(routes.ARTIFACT_JOURNAL)} aria-label="Открыть путевой дневник">
         <img src={hero.badge} alt="Дневник" loading="lazy" />
-      </div>
+      </button>
     </div>
   </header>
 
@@ -117,9 +117,22 @@
     height: clamp(52px, 14vw, 64px);
     border-radius: 50%;
     overflow: hidden;
-    background: rgba(254, 254, 252, 0.2);
+      padding: 0;
+      background: rgba(243, 237, 227, 1);
+      border: 1px solid rgba(255, 252, 248, 1);
     display: grid;
     place-items: center;
+  }
+
+  .circle.action {
+    border: 1px solid rgba(254, 254, 252, 0.4);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .circle.action:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 10px 18px rgba(24, 22, 15, 0.16);
   }
 
   .circle img {
@@ -163,7 +176,7 @@
     background: transparent;
     height: 43px;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 400;
     color: rgba(24, 22, 15, 0.5);
     cursor: pointer;
     transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
@@ -187,10 +200,11 @@
   }
 
   .floor-label {
+      text-align: center;
+      font-family: "Prata", serif;
     margin: 0 0 clamp(14px, 3vw, 20px);
     color: rgba(178, 152, 126, 1);
     font-size: 16px;
-    font-weight: 700;
   }
 
   .activities {
@@ -212,16 +226,18 @@
   }
 
   .activity-image {
-    width: 98px;
-    height: 98px;
+    width: 104px;
+    height: 104px;
     border-radius: 22px;
     overflow: hidden;
-    box-shadow: 0 6px 14px rgba(24, 22, 15, 0.08);
+      padding: 4px;
+      border: 1px solid rgba(178, 152, 126, 1);
   }
 
   .activity-image img {
     width: 100%;
     height: 100%;
+      border-radius: 22px;
     object-fit: cover;
     display: block;
   }
@@ -235,7 +251,8 @@
   .activity-title {
     margin: 0;
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 400;
+      font-family: "Prata", serif;
     color: rgba(24, 22, 15, 1);
     line-height: 1.3;
   }
@@ -243,6 +260,7 @@
   .activity-desc {
     margin: 0;
     font-size: 14px;
+      font-weight: 400;
     color: rgba(24, 22, 15, 0.72);
     line-height: 1.35;
   }

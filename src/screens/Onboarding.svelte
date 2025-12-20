@@ -4,6 +4,13 @@
     import { router, routes } from '../router';
     type SlideAction = 'next' | 'start' | 'enableAudioNext' | 'disableAudioNext';
     type Caption = { t: number; text: string };
+    type CollageImage = {
+        src: string;
+        alt: string;
+        className?: string;
+        objectPosition?: string;
+    };
+
     type Slide = {
         id: string;
         title?: string;
@@ -13,6 +20,7 @@
         showRing?: boolean;
         background?: string;
         background2?: string;
+        collage?: CollageImage[];
         primaryLabel: string;
         primaryAction?: SlideAction;
         secondaryLabel?: string;
@@ -40,8 +48,26 @@
             title: 'Собирайте впечатления',
             description:
                 'Изучайте экспонаты и наполняйте путевой дневник артефактами — каждый из них добавит новый штрих к пониманию гения Поленова',
-            imageScr: '/painting.png',
-            imageClass: 'collage-img',
+            collage: [
+                {
+                    src: '/painting-d.png',
+                    alt: 'Сюжет с женщиной у лестницы',
+                    className: 'collage-card--left',
+                    objectPosition: 'center center'
+                },
+                {
+                    src: '/painting.png',
+                    alt: 'Солнечный двор с храмом на заднем плане',
+                    className: 'collage-card--center',
+                    objectPosition: '60% 45%'
+                },
+                {
+                    src: '/painting.png',
+                    alt: 'Поляна с гуляющими детьми',
+                    className: 'collage-card--right',
+                    objectPosition: '72% 38%'
+                }
+            ],
             primaryLabel: 'Далее',
             primaryAction: 'next'
         },
@@ -155,7 +181,22 @@
     </header>
 
     <div class="main-block">
-        {#if slides[current]?.imageScr}
+        {#if slides[current]?.collage?.length}
+            <div class="hero collage-hero">
+                <div class="collage">
+                    {#each slides[current].collage as collageImage}
+                        <div class={`collage-card ${collageImage.className ?? ''}`}>
+                            <img
+                                    src={collageImage.src}
+                                    alt={collageImage.alt}
+                                    style={`object-position: ${collageImage.objectPosition ?? 'center'};`}
+                            />
+                        </div>
+                    {/each}
+                </div>
+                <div class="hero-blur"></div>
+            </div>
+        {:else if slides[current]?.imageScr}
             <div class="hero {slides[current]?.showRing ? 'hero-ring' : ''}">
                 <!--{#if slides[current]?.showRing}-->
 <!--                    <div class="hero-ring"></div>-->
@@ -391,18 +432,89 @@
         object-fit: cover;
     }
 
-    .collage-img {
-        width: 260px;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 24px;
-        box-shadow: 0 18px 32px rgba(0, 0, 0, 0.25);
-    }
-
     .guides-img {
         width: 320px;
         height: 240px;
         object-fit: contain;
+    }
+
+    .collage-hero {
+        width: 100%;
+    }
+
+    .collage {
+        position: relative;
+        width: 100vw;
+        height: 220px;
+        margin: 0 auto;
+    }
+
+    .collage-card {
+        position: absolute;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #d8d0c8;
+        transition: transform 0.2s ease;
+    }
+
+    .collage-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .collage-card--left {
+        width: 182px;
+        height: 140px;
+        top: 56px;
+        z-index: 3;
+        left: -20%;
+        transform: rotate(-8deg);
+    }
+
+    .collage-card--center {
+        width: 230px;
+        height: 150px;
+        top: -4px;
+        left: 48px;
+        transform: rotate(3deg);
+    }
+
+    .collage-card--right {
+        width: 176px;
+        height: 140px;
+        top: 40px;
+        right: -10%;
+        transform: rotate(8deg);
+    }
+
+    @media (min-width: 480px) {
+        .collage {
+            width: 360px;
+            height: 230px;
+        }
+
+        .collage-card--left {
+            width: 192px;
+            height: 148px;
+            top: 60px;
+            left: 0;
+        }
+
+        .collage-card--center {
+            width: 242px;
+            height: 156px;
+            top: 0;
+            left: 58px;
+        }
+
+        .collage-card--right {
+            width: 186px;
+            height: 146px;
+            top: 42px;
+            right: 0;
+        }
     }
 
     .hero-blur {
@@ -521,10 +633,6 @@
         .content-card {
             padding-left: 32px;
             padding-right: 32px;
-        }
-
-        .content-card h2 {
-            font-size: 28px;
         }
     }
 </style>

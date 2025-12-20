@@ -1,65 +1,38 @@
 <script>
-  import { onMount } from 'svelte';
   import { router, routes } from '../router';
   import ActivityShell from '../components/ActivityShell.svelte';
+  import FramesHolder from '../components/FramesHolder.svelte';
+  import Slider from '../components/Slider.svelte';
+  import { getArtifactForActivity } from '../data/artifacts';
 
-  const MIN_DAYS = 0;
-  const MAX_DAYS = 365;
+  // Константы конфигурации
+  const MIN_VALUE = 0;
+  const MAX_VALUE = 365;
+  const MAX_SCALE = 10;
+  const TOTAL_FRAMES_COUNT = 9;
+  const FRAME_NAME_DIGIT_COUNT = 4;
+  const FRAME_BASE_PATH = '/activityA/';
+  const FRAME_NAME_BASE = 'frame_';
+  const FRAME_NAME_EXTENSION = '.png';
 
-  const FRAMES = 9;                 // у тебя 10 картинок
-  const FRAME_PAD = 4;               // frame_0001
-  const FRAME_BASE = '/activityA/';  // public/activityA
+  // $state
+  let value = $state(MIN_VALUE);
+  let currentFrameIndex = $state(0);
+  let nextFrameIndex = $state(0);
 
-  let days = 135;
-
-  // 0..1
-  $: t = (days - MIN_DAYS) / (MAX_DAYS - MIN_DAYS);
-
-  // 0..FRAMES-1 (вещественное)
-  $: f = t * (FRAMES - 1);
-
-  // индекс кадра (0..FRAMES-1)
-  $: idx = Math.floor(f);
-
-  // прогресс внутри интервала (0..1)
-  $: mix = f - idx;
-
-  function frameName(i0based) {
-    const n = String(i0based + 1).padStart(FRAME_PAD, '0');
-    return `${FRAME_BASE}frame_${n}.png`;
-  }
-
-  // два кадра для кроссфейда
-  $: srcA = frameName(clamp(idx, 0, FRAMES - 1));
-  $: srcB = frameName(clamp(idx + 1, 0, FRAMES - 1));
-
-  function clamp(v, a, b) {
-    return Math.max(a, Math.min(b, v));
-  }
-
-  // лёгкая easing-кривая для визуально приятного перехода
-  function easeInOut(x) {
-    return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
-  }
-  $: alphaB = easeInOut(mix);
-
-  // preload (чтобы не мигало при первом скраббинге)
-  let preloaded = false;
-  onMount(() => {
-    if (preloaded) return;
-    preloaded = true;
-
-    for (let i = 0; i < FRAMES; i++) {
-      const img = new Image();
-      img.src = frameName(i);
-    }
+  // $derived
+  let frameDisplayInfo = $derived({
+    current: Math.floor((value - MIN_VALUE) / (MAX_VALUE - MIN_VALUE) * (TOTAL_FRAMES_COUNT - 1)) + 1,
+    next: Math.floor((value - MIN_VALUE) / (MAX_VALUE - MIN_VALUE) * (TOTAL_FRAMES_COUNT - 1)) + 2
   });
 
   function finish() {
-    router.go(routes.PLAYTESTS);
+    const artifact = getArtifactForActivity(routes.ACTIVITY_A);
+    router.go(routes.ARTIFACT_REWARD, { artifactId: artifact?.id });
   }
 
-  const intro = {
+  // Props для ActivityShell
+  let intro = $state({
     title: 'Подводка от учеников',
     imageUrl: 'guides.png',
     textLines: [
@@ -68,8 +41,11 @@
       'Мы изучаем его наследие и'
     ],
     buttonText: 'Далее'
-  };
+  });
 
+  function handleValueChanged(newValue) {
+    value = newValue;
+  }
 </script>
 
 <ActivityShell {intro}>
@@ -95,43 +71,54 @@
   </div>
 
   <div class="paintingCard card">
-    <div class="painting" aria-label="Картина (покадрово)">
-      <!-- базовый кадр -->
-      <img class="frame a" src={srcA} alt="Картина" />
-
-      <!-- следующий кадр поверх с альфой -->
-      <img
-        class="frame b"
-        src={srcB}
-        alt=""
-        style="opacity: {alphaB};"
-        aria-hidden="true"
-      />
-    </div>
+    <FramesHolder
+      alt='Картина Егише Татевосян - Пастух со стадом'
+      minValue={MIN_VALUE}
+      maxValue={MAX_VALUE}
+      maxScale={MAX_SCALE}
+      totalFramesCount={TOTAL_FRAMES_COUNT}
+      frameNameDigitCount={FRAME_NAME_DIGIT_COUNT}
+      frameBasePath={FRAME_BASE_PATH}
+      frameNameBase={FRAME_NAME_BASE}
+      frameNameExtension={FRAME_NAME_EXTENSION}
+      {value}
+      cssClass="painting"
+    />
   </div>
 
   <div class="sliderBlock">
     <div class="label">Количество дней под солнцем</div>
 
-    <div class="sliderRow">
+    <!--div class="sliderRow">
       <input
         class="range"
         type="range"
-        min={MIN_DAYS}
-        max={MAX_DAYS}
+        min={MIN_VALUE}
+        max={MAX_VALUE}
         step="1"
-        bind:value={days}
+        bind:value
         aria-label="Количество дней под солнцем"
       />
-      <div class="pill" aria-label="Значение">{days}</div>
-    </div>
+      <div class="pill" aria-label="Значение">{value}</div>
+    </div-->
+
+    <Slider
+      value={value}
+      minValue={MIN_VALUE}
+      maxValue={MAX_VALUE}
+      onValueChanged={handleValueChanged}
+      cssClass="my-custom-slider"
+    />
 
     <div class="small">
-      Кадр: {idx + 1}{#if idx < FRAMES - 1} → {idx + 2}{/if}
+      Кадр: {frameDisplayInfo.current}
+      {#if frameDisplayInfo.current < TOTAL_FRAMES_COUNT}
+        → {frameDisplayInfo.next}
+      {/if}
     </div>
   </div>
 
-  <button class="btn-primary finish" type="button" on:click={finish}>
+  <button class="btn-primary finish" type="button" onclick={finish}>
     Завершить
   </button>
 </div>
@@ -197,33 +184,23 @@
   }
 
   .paintingCard{
-    padding: 10px;
+    height: 220px;
   }
-  .painting{
-    position: relative;
-    border-radius: 16px;
+
+  .painting {
+    /*border-radius: 16px;*/
     overflow: hidden;
     aspect-ratio: 4 / 3;
     background: rgba(0,0,0,0.04);
   }
 
-  .frame{
-    position:absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display:block;
-  }
-  .a{ opacity: 1; }
-  .b{
-    /* opacity управляется inline */
-    will-change: opacity;
+  .my-custom-slider {
   }
 
   .sliderBlock{
     margin-top: 2px;
     text-align:center;
+    background-color: #00000033;
   }
   .label{
     font-size: 13px;

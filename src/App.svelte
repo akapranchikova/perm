@@ -12,6 +12,8 @@
   import ActivityC from './activities/ActivityC.svelte';
   import ActivityD from './activities/ActivityD.svelte';
   import ActivityE from './activities/ActivityE.svelte';
+  import ArtifactReward from './screens/ArtifactReward.svelte';
+  import ArtifactJournal from './screens/ArtifactJournal.svelte';
 
 </script>
 
@@ -32,6 +34,10 @@
     <ActivityD />
   {:else if $router.name === routes.ACTIVITY_E}
     <ActivityE />
+  {:else if $router.name === routes.ARTIFACT_REWARD}
+    <ArtifactReward />
+  {:else if $router.name === routes.ARTIFACT_JOURNAL}
+    <ArtifactJournal />
   {:else}
     <div class="safe">
       <p class="h1">Неизвестный экран</p>

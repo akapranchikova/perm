@@ -8,7 +8,9 @@ export const routes = /** @type {const} */ ({
   ACTIVITY_B: "ACTIVITY_B",
   ACTIVITY_C: "ACTIVITY_C",
   ACTIVITY_D: "ACTIVITY_D",
-  ACTIVITY_E: 'ACTIVITY_E'
+  ACTIVITY_E: 'ACTIVITY_E',
+  ARTIFACT_REWARD: 'ARTIFACT_REWARD',
+  ARTIFACT_JOURNAL: 'ARTIFACT_JOURNAL'
 });
 
 function createRouter() {

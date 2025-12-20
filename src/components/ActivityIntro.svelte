@@ -113,9 +113,6 @@
     color: rgba(17,24,39,0.60);
     font-weight: 700;
   }
-  .line b{
-    color: rgba(17,24,39,0.85);
-  }
 
   .bottomBtn{
     width: 100%;

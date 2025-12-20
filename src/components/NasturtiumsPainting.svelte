@@ -535,10 +535,10 @@
             container.addEventListener("click", handleMouseClick);
         }
 
-        return () => removeEventListeners();
+        return removeEventListeners;
     });
 
-    onDestroy(() => removeEventListeners());
+    onDestroy(removeEventListeners);
 </script>
 
 <div class="container {containerCssClass}" bind:this={container}>

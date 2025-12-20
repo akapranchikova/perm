@@ -2,6 +2,7 @@
   import { router, routes } from "../router";
   //import ZoomPan from "../components/ZoomPan.svelte";
   import ActivityShell from "../components/ActivityShell.svelte";
+  import { getArtifactForActivity } from "../data/artifacts";
 
   import NasturtiumsPainting from '../components/NasturtiumsPainting.svelte';
   import CommonButton from '../components/CommonButton.svelte';
@@ -48,7 +49,7 @@
 
   let wrongTaps = 0;
   const HINT_AFTER = 3;*/
-  let hintShown = false;
+  let hintShown = $state(false);
 
   /*
   let zoomPanRef;
@@ -97,8 +98,8 @@
     correctIndex: 1,
   };
 
-  let chosen = null;
-  let isCorrect = null;
+  let chosen = $state(null);
+  let isCorrect = $state(null);
 
   function choose(i) {
     if (chosen !== null) return;
@@ -111,7 +112,8 @@
   }
 
   function finish() {
-    router.go(routes.PLAYTESTS);
+    const artifact = getArtifactForActivity(routes.ACTIVITY_D);
+    router.go(routes.ARTIFACT_REWARD, { artifactId: artifact?.id });
   }
 
   const intro = {

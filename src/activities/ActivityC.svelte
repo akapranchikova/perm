@@ -2,6 +2,7 @@
   import { router, routes } from "../router";
   import { quizC } from "./quizC";
   import ActivityShell from "../components/ActivityShell.svelte";
+  import { getArtifactForActivity } from "../data/artifacts";
 
   const stages = /** @type {const} */ ({
     STORY: "STORY",
@@ -51,7 +52,8 @@
   }
 
   function finish() {
-    router.go(routes.PLAYTESTS);
+    const artifact = getArtifactForActivity(routes.ACTIVITY_C);
+    router.go(routes.ARTIFACT_REWARD, { artifactId: artifact?.id });
   }
 
   // Тексты в бабле: на story — интро/продолжение, на вопрос — просто prompt (как в мокапе "Вопрос")

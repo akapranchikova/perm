@@ -7,6 +7,7 @@
   import ActivityShell from "../components/ActivityShell.svelte";
 
   import TravelerMap from '../components/TravelerMap.svelte';
+  import { getArtifactForActivity } from "../data/artifacts";
 
   const steps = {
     MAP: "MAP",
@@ -44,9 +45,8 @@
   }
 
   function finishToGlobalMap() {
-    // пока у нас нет “общей карты экспонатов” как отдельного экрана.
-    // поэтому показываем модал с городами (как мокап) и затем выходим в плейтесты.
-    expoModalOpen = true;
+    const artifact = getArtifactForActivity(routes.ACTIVITY_E);
+    router.go(routes.ARTIFACT_REWARD, { artifactId: artifact?.id });
   }
 
   function openExpoCity(c) {

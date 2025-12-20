@@ -4,6 +4,7 @@
   import Modal from '../components/Modal.svelte';
   import AudioWithCaptions from '../components/AudioWithCaptions.svelte';
   import XR8Scene from './XR8Scene.svelte';
+  import { getArtifactForActivity } from '../data/artifacts';
 
   // шаги
   const steps = /** @type {const} */ ({
@@ -45,7 +46,8 @@
   }
 
   function finish() {
-    router.go(routes.PLAYTESTS);
+    const artifact = getArtifactForActivity(routes.ACTIVITY_B);
+    router.go(routes.ARTIFACT_REWARD, { artifactId: artifact?.id });
   }
 </script>
 
