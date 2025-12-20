@@ -208,25 +208,4 @@
     line-height: 1.2;
     color: rgba(24, 22, 15, 0.88);
   }
-
-  .cta-button {
-    width: 100%;
-    min-height: 51px;
-    border-radius: 100px;
-    border: none;
-    background: rgba(178, 152, 126, 1);
-    color: #fff;
-    font-family: "Inter", sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1;
-    cursor: pointer;
-    box-shadow: 0 8px 20px rgba(24, 22, 15, 0.12);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-  }
-
-  .cta-button:active {
-    transform: translateY(1px) scale(0.99);
-    box-shadow: 0 6px 14px rgba(24, 22, 15, 0.1);
-  }
 </style>

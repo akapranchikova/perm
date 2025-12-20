@@ -173,28 +173,6 @@
     background-image: url("/assets/logo-arch.png");
   }
 
-  .sound-btn {
-    width: 52px;
-    height: 48px;
-    border-radius: 19px;
-    padding: 12px 14px;
-    border: 1px solid rgba(255, 252, 248, 0.6);
-    background: rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(16px);
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-  }
-
-  .sound-btn.muted {
-    opacity: 0.7;
-  }
-
-  .sound-btn img {
-    width: 18px;
-    height: 18px;
-  }
-
   .content {
     position: relative;
     height: 100%;
@@ -228,29 +206,5 @@
     flex-direction: column;
     gap: 12px;
     width: 100%;
-  }
-
-  .cta-button {
-    width: 100%;
-    height: 51px;
-    border-radius: 100px;
-    font-size: 16px;
-    font-weight: 400;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
-    border: none;
-  }
-
-  .cta-button.primary {
-    background: rgba(254, 254, 252, 1);
-    color: rgba(24, 22, 15, 1);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  }
-
-  .cta-button:active {
-    transform: translateY(1px) scale(0.99);
   }
 </style>

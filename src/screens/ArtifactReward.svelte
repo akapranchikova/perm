@@ -224,25 +224,6 @@
     max-width: 360px;
   }
 
-  .cta-button {
-    width: 100%;
-    height: 51px;
-    border-radius: 100px;
-    border: none;
-    background: var(--accent);
-    color: #fff;
-    font-size: 16px;
-    font-weight: 700;
-    box-shadow: 0 10px 30px rgba(24, 22, 15, 0.16);
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  .cta-button:active {
-    transform: translateY(1px) scale(0.98);
-    box-shadow: 0 10px 18px rgba(24, 22, 15, 0.22);
-  }
-
   @media (min-width: 480px) {
     h1 {
       font-size: 32px;

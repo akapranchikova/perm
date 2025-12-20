@@ -371,30 +371,6 @@
         background-image: url('/assets/logo-sber-circle.png');
     }
 
-    .sound-btn {
-        width: 52px;
-        height: 48px;
-        border-radius: 19px;
-        padding: 12px 14px;
-        border: 1px solid rgba(255, 252, 248, 0.6);
-        background: rgba(0, 0, 0, 0.15);
-        backdrop-filter: blur(16px);
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-    }
-
-    .sound-btn img {
-        width: 24px;
-        height: 24px;
-    }
-
-    .sound-btn.muted {
-        border-color: rgba(255, 252, 248, 0.3);
-        background: rgba(0, 0, 0, 0.35);
-        opacity: 0.85;
-    }
-
     .main-block {
         position: relative;
         flex: 1;
@@ -573,41 +549,6 @@
 
     }
 
-    .buttons {
-        display: flex;
-        flex-direction: column;
-        gap: clamp(10px, 3vw, 14px);
-        width: 100%;
-    }
-
-    .cta-button {
-        width: 100%;
-        min-height: clamp(46px, 10vw, 54px);
-        border-radius: 100px;
-        font-size: clamp(15px, 3.6vw, 16px);
-        font-weight: 400;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
-    }
-
-    .cta-button.primary {
-        background: rgba(254, 254, 252, 1);
-        color: rgba(24, 22, 15, 1);
-        border: none;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-    }
-
-    .cta-button.secondary {
-        border: 1.5px solid rgba(229, 220, 220, 0.44);
-        color: rgba(254, 254, 252, 1);
-        background: rgba(24, 22, 15, 0.4);
-        backdrop-filter: blur(92.9px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-    }
-
     .audioLayer {
         position: absolute;
         inset: 0;
@@ -617,6 +558,13 @@
 
     .audioLayer :global(audio) {
         display: none;
+    }
+
+    .buttons {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(10px, 3vw, 14px);
+        width: 100%;
     }
 
     .onboarding-screen :global(.captions) {

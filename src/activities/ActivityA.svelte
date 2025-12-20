@@ -69,7 +69,7 @@
         <span class="logo logo-arch" aria-hidden="true"></span>
       </div>
 
-      <button class="icon" type="button" aria-label="Звук">
+      <button class="sound-btn" type="button" aria-label="Звук">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
           <path d="M11 5L6.5 9H3v6h3.5L11 19V5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
           <path d="M16 9c1.5 1.5 1.5 4.5 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -142,7 +142,7 @@
           </div>
       {/if}
 
-    <button class="finish" type="button" on:click={handlePrimaryAction}>
+    <button class="cta-button primary " type="button" on:click={handlePrimaryAction}>
       {isSliderCompleted ? 'Завершить' : 'Далее'}
     </button>
   </div>
@@ -222,52 +222,8 @@
     background-image: url('/assets/logo-arch.png');
   }
 
-  .icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 16px;
-    background: rgba(0, 0, 0, 0.18);
-    border: 1px solid rgba(255, 252, 248, 0.36);
-    color: #fefcf8;
-    display: flex;
-    align-items: center;
-      padding: 0;
-    justify-content: center;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
-    backdrop-filter: blur(12px);
-  }
-
   .quote {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    padding: 4px 16px 4px 4px;
-      z-index: 5;
-      border-radius: 1000px;
-      background: rgba(178, 152, 126, 0.82);
-      color: #fefcf8;
-
-  }
-
-  .avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 999px;
-    object-fit: cover;
-    border: 1px solid rgba(254, 254, 252, 1);
-    flex: 0 0 auto;
-  }
-
-  .bubble {
-    flex: 1;
-  }
-
-  .bubbleText {
-    font-size: 14px;
-    line-height: 1.3;
-    color: #fefcf8;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    z-index: 5;
   }
 
   .body {

@@ -471,24 +471,15 @@
     .sound-btn {
       width: 48px;
       height: 46px;
-      border-radius: 18px;
       padding: 0;
-      border: 1px solid rgba(255, 252, 248, 0.65);
-      background: rgba(0, 0, 0, 0.28);
-      backdrop-filter: blur(14px);
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-    }
-    .sound-btn.muted {
-      opacity: 0.7;
-      border-color: rgba(255, 252, 248, 0.4);
     }
     .sound-btn--light {
       background: rgba(255, 255, 255, 0.8);
       border-color: rgba(178, 152, 126, 0.45);
       width: 44px;
       height: 44px;
+      color: var(--text-primary);
+      box-shadow: 0 8px 18px rgba(24, 22, 15, 0.12);
     }
     .sound-btn--light img {
       filter: invert(28%) sepia(10%) saturate(773%) hue-rotate(350deg) brightness(96%) contrast(91%);

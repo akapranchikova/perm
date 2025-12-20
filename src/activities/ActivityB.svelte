@@ -95,7 +95,7 @@
             <div class="name">{memo.name}</div>
             <div class="role">{memo.role}</div>
           </div>
-          <button class="icon" type="button" aria-label="Звук (мьют)">
+          <button class="sound-btn" type="button" aria-label="Звук (мьют)">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <path d="M11 5L6.5 9H3v6h3.5L11 19V5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
               <path d="M16 9c1.5 1.5 1.5 4.5 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -235,9 +235,10 @@
     font-size: 12px;
     color: rgba(17,24,39,0.6);
   }
-  .icon{
+  .sound-btn{
     width: 36px;
     height: 36px;
+    padding: 6px;
     border-radius: 999px;
     background: rgba(255,255,255,0.55);
     border: 1px solid rgba(17,24,39,0.08);
@@ -246,6 +247,8 @@
     align-items:center;
     justify-content:center;
     flex: 0 0 auto;
+    box-shadow: none;
+    backdrop-filter: blur(8px);
   }
 
   .portraitCard{
