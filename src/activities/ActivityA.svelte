@@ -156,7 +156,7 @@
     gap: 16px;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100dvh;
     color: var(--txt-white);
       background: url('/images/background1.png') center / cover no-repeat;
   }

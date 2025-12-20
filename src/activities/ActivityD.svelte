@@ -328,7 +328,7 @@
   <style>
     .actD {
       padding: 0;
-      height: 100%;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       background: #18160f;

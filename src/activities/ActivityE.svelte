@@ -301,7 +301,7 @@
 
   <style>
     .actE {
-      height: 100%;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       gap: 12px;

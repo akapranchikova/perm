@@ -104,7 +104,7 @@
   .playtests {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100dvh;
     background: rgba(178, 152, 126, 1);
   }
 

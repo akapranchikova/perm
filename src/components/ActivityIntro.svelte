@@ -72,7 +72,7 @@
   }
 
   .intro-screen {
-    height: 100%;
+      height: 100svh;
     background: #fefcf8;
     color: rgba(24, 22, 15, 1);
     display: flex;

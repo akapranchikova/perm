@@ -66,8 +66,8 @@
 <style>
   .guide-screen {
     position: relative;
-    height: 100vh;
-    max-height: 100vh;
+    height: 100svh;
+    min-height: 100dvh;
     width: 100%;
     background: var(--bg) center / cover no-repeat;
     overflow: hidden;

@@ -142,7 +142,7 @@
 <style>
   .activityB{
     position: relative;
-    height: 100%;
+    height: 100dvh;
   }
 
   .card{

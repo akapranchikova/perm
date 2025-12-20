@@ -119,7 +119,7 @@ body {
 .cta-button.primary {
   background: var(--cta-primary);
   color: var(--text-primary);
-  border-color: var(--border);
+  border-color: var(--cta-primary);
   box-shadow: var(--shadow-strong);
 }
 
@@ -152,14 +152,13 @@ body {
   width: 52px;
   height: 48px;
   border-radius: 19px;
+  padding: 0;
   border: 1px solid rgba(255, 252, 248, 0.6);
   background: transparent;
-  backdrop-filter: blur(16px);
   display: grid;
   place-items: center;
   cursor: pointer;
   color: #fefcfc;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
   transition: opacity 0.2s ease;
 }
 
