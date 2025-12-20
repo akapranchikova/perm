@@ -559,6 +559,8 @@
         margin: 0;
         padding: 0;
         overflow: hidden;
+        width: 100%;
+        height: 100%;
         position: relative;
         touch-action: none;
         user-select: none;
