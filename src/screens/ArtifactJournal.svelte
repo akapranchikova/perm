@@ -29,7 +29,7 @@
         <h1>{journalCopy.title}</h1>
         <p>{journalCopy.subtitle}</p>
     </div>
-    <div>
+    <div class="artifact-list">
         <section class="slider">
             {#each artifactsCatalog as artifact}
                 <article class={`card ${collected.find((a) => a.id === artifact.id) ? 'collected' : 'locked'}`}>
@@ -57,13 +57,13 @@
 
 <style>
   .journal-screen {
-    height: 100%;
+    min-height: 100vh;
     background: #fdfaf5;
     color: rgba(24, 22, 15, 1);
     display: flex;
     flex-direction: column;
-    padding: 22px 20px 28px;
-    gap: 16px;
+      padding: 20px;
+    gap: clamp(12px, 2vh, 18px);
   }
 
   .journal-header {
@@ -105,14 +105,27 @@
     color: rgba(24, 22, 15, 0.7);
   }
 
+  .artifact-list {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 2vh, 18px);
+    width: 100%;
+  }
+
   .slider {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 100vw;
     gap: 16px;
     overflow-x: auto;
-    padding: 6px 2px 8px;
+    padding: clamp(4px, 1vh, 8px) 2px clamp(8px, 2vh, 12px);
     scroll-snap-type: x mandatory;
+    align-items: center;
+      overflow-y: hidden;
+    min-height: 0;
+    width: 100%;
   }
 
   .slider::-webkit-scrollbar {
@@ -125,16 +138,16 @@
   }
 
   .card {
-      width: 100vw;
+    width: 100%;
     border-radius: 22px;
-    padding: 14px 14px 16px;
+    padding: clamp(12px, 2vh, 16px);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: clamp(8px, 2vh, 12px);
     scroll-snap-align: center;
     position: relative;
-    min-height: 320px;
-      background: #f3ede7;
+    min-height: clamp(230px, 44vh, 320px);
+    background: #f3ede7;
   }
 
   .card.locked {
@@ -144,16 +157,19 @@
   .image-shell {
     background: #f3ede7;
     border-radius: 18px;
-    padding: 12px;
-    display: grid;
-    place-items: center;
-    min-height: 200px;
+    padding: clamp(10px, 2vh, 14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(160px, 38vh, 220px);
   }
 
   .image-shell img {
-    max-width: 200px;
+    max-width: clamp(220px, 70vw, 280px);
+    max-height: 100%;
     width: 100%;
     height: auto;
+    object-fit: contain;
     display: block;
   }
 
@@ -187,12 +203,13 @@
       flex-direction: column;
     align-items: center;
     gap: 12px;
+    margin-top: clamp(8px, 2vh, 12px);
   }
 
   .progress {
     font-weight: 400;
       font-size: 14px;
-      margin-top: 15px;
+      margin-top: clamp(10px, 2vh, 16px);
     color: rgba(24, 22, 15, 0.7);
     text-align: center;
   }

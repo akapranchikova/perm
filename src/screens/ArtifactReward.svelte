@@ -77,7 +77,7 @@
   .reward-screen {
     position: relative;
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     background: #fdfaf5;
     color: rgba(24, 22, 15, 1);
     overflow: hidden;
@@ -149,13 +149,15 @@
   }
 
   .content {
-    padding: 20px 22px 32px;
+    padding: clamp(18px, 4vh, 26px) 22px clamp(20px, 5vh, 32px);
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: clamp(14px, 3vh, 24px);
     align-items: center;
+    justify-content: center;
     text-align: center;
     flex: 1;
+    min-height: 0;
   }
 
   .text-block {
@@ -163,6 +165,8 @@
     flex-direction: column;
     gap: 8px;
     margin-top: 6px;
+    max-width: 480px;
+    padding: 0 clamp(4px, 2vw, 12px);
   }
 
   h1 {
@@ -180,28 +184,32 @@
   }
 
   .artifact-frame {
-    width: 100%;
-    max-width: 360px;
-    padding: 20px 16px 18px;
+    width: min(420px, 100%);
+    flex: 1;
+    min-height: 0;
+    padding: clamp(12px, 3vh, 20px) 16px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: clamp(10px, 2vh, 16px);
   }
 
   .arch {
     border-top: 1.5px solid rgba(178, 152, 126, 0.5);
     border-radius: 999px 999px 28px 28px;
-    padding: 20px;
-    display: grid;
-    place-items: center;
-    min-height: 260px;
+    padding: clamp(14px, 3vh, 22px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(220px, 50vh, 360px);
   }
 
   .arch img {
     max-width: 260px;
     width: 100%;
-    height: auto;
+    height: 100%;
+    max-height: 100%;
     display: block;
+    object-fit: contain;
   }
 
   .artifact-caption {
@@ -212,7 +220,7 @@
 
   .cta {
     width: 100%;
-      margin-top: auto;
+    margin-top: auto;
     max-width: 360px;
   }
 

@@ -135,6 +135,7 @@
 
   .hero {
     width: 100%;
+      min-height: 150px;
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid rgba(178, 152, 126, 0.7);
