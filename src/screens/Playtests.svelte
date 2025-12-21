@@ -286,12 +286,6 @@
     line-height: 1.35;
   }
 
-  .placeholder {
-    background: rgba(243, 237, 227, 0.7);
-    border-radius: 18px;
-    padding: clamp(14px, 3.5vw, 18px);
-  }
-
   .map-image {
     padding: clamp(12px, 3vw, 16px);
     display: grid;

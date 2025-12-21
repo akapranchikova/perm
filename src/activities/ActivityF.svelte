@@ -61,12 +61,13 @@
 </script>
 
 <ActivityShell {intro}>
-  <div class="safe activity">
+  <div
+    class="safe activity media-screen"
+    style="--screen-bg: url('/images/background1.png'); --overlay-text: var(--txt-white);"
+  >
     <div class="topbar">
       <div class="logo-group" aria-label="Поленов и Сбер">
-        <span class="logo logo-sber-circle" aria-hidden="true"></span>
-        <span class="logo logo-cross" aria-hidden="true"></span>
-        <span class="logo logo-arch" aria-hidden="true"></span>
+        <span class="logo logo-white" aria-hidden="true"></span>
       </div>
 
       <button class="sound-btn" type="button" aria-label="Звук">
@@ -142,7 +143,7 @@
           </div>
       {/if}
 
-    <button class="cta-button primary " type="button" on:click={handlePrimaryAction}>
+    <button class="cta-button primary " type="button" onclick={handlePrimaryAction}>
       {isSliderCompleted ? 'Завершить' : 'Далее'}
     </button>
   </div>
@@ -158,15 +159,6 @@
     flex-direction: column;
     height: 100dvh;
     color: var(--txt-white);
-      background: url('/images/background1.png') center / cover no-repeat;
-  }
-
-  .activity::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255, 255, 255, 0.50);
-      pointer-events: none;
   }
 
   .topbar {
@@ -191,37 +183,6 @@
     background-position: center;
   }
 
-  .logo-sber-circle {
-    width: 36px;
-    height: 36px;
-    background-image: url('/assets/logo-sber-circle.png');
-  }
-
-  .logo-cross {
-    width: 18px;
-    height: 1.5px;
-    background: #fefcf8;
-    transform: rotate(-45deg);
-    position: relative;
-    opacity: 0.9;
-  }
-
-  .logo-cross::after {
-    content: '';
-    position: absolute;
-    width: 18px;
-    height: 1.5px;
-    background: #fefcf8;
-    transform: rotate(90deg);
-    inset: 0;
-  }
-
-  .logo-arch {
-    width: 36px;
-    height: 36px;
-    background-image: url('/assets/logo-arch.png');
-  }
-
   .quote {
     z-index: 5;
   }
@@ -239,10 +200,7 @@
     overflow: hidden;
   }
 
-  .paintingCard.card {
-  }
-
-  .painting {
+  :global(.painting) {
     overflow: hidden;
     aspect-ratio: 16 / 10;
   }
@@ -318,38 +276,4 @@
   }
   */
 
-  .finish {
-    margin-top: auto;
-    width: 100%;
-    border-radius: 26px;
-    padding: 16px 14px;
-    font-size: 16px;
-      z-index: 5;
-    font-weight: 400;
-    background: rgba(254, 252, 248, 0.92);
-    color: #1e1b16;
-    border: 1px solid rgba(255, 252, 248, 0.55);
-    cursor: pointer;
-    transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
-  }
-
-  .bottom-gradient {
-      position: absolute;
-      left: 0;
-      right: 0;
-      z-index: 1;
-      pointer-events: none;
-      bottom: 0;
-      height: 340px;
-      background: linear-gradient(
-              180deg,
-              rgba(16, 13, 10, 0) 0%,
-              rgba(16, 13, 10, 0.8) 100%
-      );
-  }
-
-  .finish:active {
-    transform: translateY(1px) scale(0.99);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
-  }
 </style>

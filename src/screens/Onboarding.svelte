@@ -159,16 +159,15 @@
 </script>
 
 <div
-        class="onboarding-screen onboarding-screen-{current + 1}"
-        style={`--screen-bg: url('${slides[current]?.background ?? '/images/background1.png'}'); --screen-bg2: ${slides[current]?.background2 ? 'url(\'' +slides[current]?.background2 + '\')': 'transparent'};`}
+        class="onboarding-screen onboarding-screen-{current + 1} media-screen"
+        style={`--screen-bg: url('${slides[current]?.background ?? '/images/background1.png'}'); --screen-foreground: ${slides[current]?.background2 ? 'url(\'' +slides[current]?.background2 + '\')': 'transparent'}; --screen-overlay: ${slides[current]?.id === 'audio-journey' ? 'transparent' : 'rgba(255, 255, 255, 0.50)'};`}
 >
     <div class="top-gradient"></div>
+    <div class="media-foreground"></div>
 
     <header class="top-container">
         <div class="logo-group">
-            <span class="logo logo-sber-circle" aria-hidden="true"></span>
-            <span class="logo logo-cross" aria-hidden="true"></span>
-            <span class="logo logo-arch" aria-hidden="true"></span>
+            <span class="logo logo-white" aria-hidden="true"></span>
         </div>
 
         {#if slides[current]?.audio}
@@ -227,7 +226,7 @@
 
 
     {#if slides[current]?.audio}
-        <div class="audioLayer">
+        <div class="audio-layer">
             <AudioWithCaptions
                     src={slides[current].audio.src}
                     captions={slides[current].audio.captions}
@@ -276,52 +275,11 @@
         min-height: 100svh;
         overflow: hidden;
         color: #18160f;
-        background: var(--screen-bg) center/cover no-repeat;
         display: flex;
         flex-direction: column;
         padding: 20px;
         gap: clamp(18px, 4vw, 28px);
         box-sizing: border-box;
-    }
-
-    .onboarding-screen::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: rgba(255, 255, 255, 0.50);
-        pointer-events: none;
-    }
-    .onboarding-screen-6::before {
-        background: transparent;
-    }
-
-    .onboarding-screen::after {
-        position: absolute;
-        content: '';
-        width: 100%;
-        height: 100%;
-        background: var(--screen-bg2) center/cover no-repeat;
-    }
-
-    .top-gradient,
-    .bottom-gradient {
-        position: absolute;
-        left: 0;
-        width: 100%;
-        z-index: 1;
-        pointer-events: none;
-    }
-
-    .top-gradient {
-        top: 0;
-        height: clamp(150px, 28vh, 210px);
-        background: linear-gradient(180deg, rgba(16, 13, 10, 0.85) 0%, rgba(16, 13, 10, 0.25) 70%, transparent 100%);
-    }
-
-    .bottom-gradient {
-        bottom: 0;
-        height: clamp(240px, 42vh, 340px);
-        background: linear-gradient(180deg, rgba(16, 13, 10, 0) 0%, rgba(16, 13, 10, 0.8) 100%);
     }
 
     .top-container {
@@ -339,40 +297,11 @@
         gap: 10px;
     }
 
-    .logo-cross {
-        width: 24px;
-        height: 1.5px;
-        background: #ffffff;
-        transform: rotate(-45deg);
-        position: relative;
-    }
-
-    .logo-cross::after {
-        content: '';
-        position: absolute;
-        width: 24px;
-        height: 1.5px;
-        background: #ffffff;
-        transform: rotate(90deg);
-    }
-
     .logo {
         display: inline-block;
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center;
-    }
-
-    .logo-arch {
-        width: 44px;
-        height: 44px;
-        background-image: url('/assets/logo-arch.png');
-    }
-
-    .logo-sber-circle {
-        width: 44px;
-        height: 44px;
-        background-image: url('/assets/logo-sber-circle.png');
     }
 
     .main-block {
@@ -551,17 +480,6 @@
         line-height: 1.35;
         color: rgba(24, 22, 15, 1);
 
-    }
-
-    .audioLayer {
-        position: absolute;
-        inset: 0;
-        z-index: 2;
-        pointer-events: none;
-    }
-
-    .audioLayer :global(audio) {
-        display: none;
     }
 
     .buttons {

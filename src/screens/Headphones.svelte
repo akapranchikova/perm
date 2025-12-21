@@ -25,11 +25,11 @@
       </p>
     </div>
 
-    <div class="btns">
-      <button class="btn-outline" on:click={continueWithout}>
+    <div class="button-row">
+      <button class="cta-button outline" on:click={continueWithout}>
         Продолжить без наушников
       </button>
-      <button class="btn-primary" on:click={continueWith}>
+      <button class="cta-button primary" on:click={continueWith}>
         Подключить наушники
       </button>
     </div>

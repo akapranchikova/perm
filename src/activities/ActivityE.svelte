@@ -112,43 +112,42 @@
           </div>
         </div>
 
-      <div class="hint">{trip1899.hint}</div>
-
-      {#if canFinish}
-        <button
-          class="btn-primary bottomBtn"
-          type="button"
-          onclick={finishToGlobalMap}
-        >
-          Завершить
-        </button>
-      {/if}
-    {/if}
-
-    {#if step === steps.CITY && activeCity}
-      <div class="topbar">
-          <div class="logo-group">
-              <span class="logo logo-brown" aria-hidden="true"></span>
+        <div class="hintRow">
+          <div class="hint">{trip1899.hint}</div>
+        </div>
+      </section>
+    {:else if step === steps.CITY && activeCity}
+      <section class="city-screen">
+        <div class="topbar">
+          <div class="topbar-left">
+                  <span class="logo logo-brown" aria-hidden="true"></span>
           </div>
-          <button class="sound-btn" type="button" aria-label="Звук">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                  <path
-                          d="M11 5L6.5 9H3v6h3.5L11 19V5z"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linejoin="round"
-                  />
-                  <path
-                          d="M16 9c1.5 1.5 1.5 4.5 0 6"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                  />
-              </svg>
+          <button
+            class="sound-btn sound-btn--light"
+            class:muted={!$settings.audioEnabled}
+            type="button"
+            aria-label={$settings.audioEnabled ? "Выключить звук" : "Включить звук"}
+            onclick={() =>
+              settings.update((s) => ({ ...s, audioEnabled: !s.audioEnabled }))
+            }
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M11 5L6.5 9H3v6h3.5L11 19V5z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M16 9c1.5 1.5 1.5 4.5 0 6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
           </button>
-      </div>
+        </div>
         <div class="cityTitle">{activeCity.name}</div>
-
 
         <div class="quote">
           <img class="avatar" src={trip1899.guideAvatarUrl} alt="Гид" />
@@ -246,36 +245,35 @@
     }
 
     .card {
-        background: transparent;
-        border: none;
-      border-radius: 24px;
-        padding: 0;
+      background: rgba(254, 252, 248, 0.9);
+      padding: 0;
+      border: none;
+      box-shadow: none;
+    }
+
+    .map-screen {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex: 1;
     }
 
     .header .title {
-      color: rgba(24, 22, 15, 1);
-        font-family: Prata, serif;
-        font-weight: 400;
-        font-size: 28px;
-        line-height: 120%;
-        letter-spacing: 0;
-        text-align: center;
-
+      color: rgba(59, 42, 31, 1);
+      font-family: Prata, serif;
+      font-weight: 400;
+      font-size: 30px;
+      line-height: 120%;
+      text-align: center;
+      margin: 0;
     }
 
-    .mapCard {
-    }
     .map {
       position: relative;
       border-radius: 18px;
       overflow: hidden;
-      aspect-ratio: 3 / 4;
-    }
-    .mapImg {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+      aspect-ratio: 335 / 412;
+      background: rgba(254, 252, 248, 0.82);
     }
 
     :global(.map-container) {
@@ -299,14 +297,14 @@
     }
 
     .hint {
-      color: rgba(24, 22, 15, 1);
-      white-space: pre-line;
-        font-family: Inter, sans-serif;
-        font-weight: 400;
-        font-size: 16px;
-        line-height: 120%;
-        text-align: center;
+      max-width: 320px;
+    }
 
+    .city-screen {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex: 1;
     }
 
     .topbar {
@@ -316,13 +314,123 @@
       gap: 12px;
       padding-top: 2px;
     }
-    .cityTitle,
-    .finalTitle {
-        font-family: Prata, serif;
-        font-weight: 400;
-        font-size: 18px;
-        line-height: 120%;
 
+    .finalState {
+        padding: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .cityTitle {
+      font-family: Prata, serif;
+      font-weight: 400;
+      font-size: 22px;
+      line-height: 120%;
+      color: var(--text-primary);
+    }
+
+    .videoCard {
+      position: relative;
+      overflow: hidden;
+      min-height: 260px;
+        margin: 0 -20px;
+    }
+
+    .video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .playBtn {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      backdrop-filter: none;
+    }
+
+    .videoCard :global(.captions) {
+      left: 12px;
+      right: 12px;
+      bottom: 18px;
+      font-size: 16px;
+      color: rgba(254, 254, 252, 0.98);
+      text-shadow: 0 6px 18px rgba(0, 0, 0, 0.36);
+    }
+
+    .city-screen .cta-button {
+      margin-top: auto;
+    }
+
+    .final-screen {
+      position: relative;
+      min-height: 100dvh;
+      width: 100%;
+      background: var(--bg-image, linear-gradient(180deg, #fefcf8 0%, #ffffff 100%));
+      background-size: cover;
+      background-position: center;
+      color: #fefcfc;
+      overflow: hidden;
+      border-radius: 0;
+    }
+
+    .final-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(24, 22, 15, 0.28) 0%, rgba(24, 22, 15, 0.8) 100%);
+      z-index: 1;
+    }
+
+    .final-topbar {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 2;
+    }
+
+    .final-content {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 20px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+      align-items: center;
+    }
+
+    .finalText {
+      font-size: 16px;
+      line-height: 1.4;
+      color: rgba(254, 254, 252, 0.92);
+      text-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    .heroImage {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .heroImage img {
+        width: 100%;
+        max-height: 100%;
+        object-fit: cover;
     }
 
     .logo-group {

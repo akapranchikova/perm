@@ -310,7 +310,7 @@ function initSceneObjects() {
       <!-- Подсказка или Кнопка -->
       <div class="bottom-controls">
         {#if showFinishButton}
-          <button class="btn-primary" on:click={handleFinish} in:fade>
+          <button class="cta-button primary cta-button--compact" on:click={handleFinish} in:fade>
             Изучить
           </button>
         {:else}
@@ -429,31 +429,8 @@ function initSceneObjects() {
     animation: pulse 2s infinite;
   }
 
-  .btn-primary {
-    background: white;
-    color: black;
-    border: none;
-    padding: 16px 40px;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(255,255,255,0.4);
-    transition: transform 0.2s;
-    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  .btn-primary:active {
-    transform: scale(0.95);
-  }
-
   @keyframes pulse {
     0%, 100% { opacity: 0.7; }
     50% { opacity: 1; }
-  }
-
-  @keyframes popIn {
-    from { transform: scale(0); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
   }
 </style>

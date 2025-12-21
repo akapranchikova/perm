@@ -18,14 +18,16 @@
   export let onNext = () => {};
 </script>
 
-<div class="guide-screen" style={`--bg: url('${background}');`}>
+<div
+  class="guide-screen media-screen"
+  style={`--screen-bg: url('${background}'); --screen-foreground: url('/assets/woman.png'); --overlay-text: rgba(254, 254, 252, 1);`}
+>
+  <div class="media-foreground"></div>
   <div class="top-gradient"></div>
 
   <header class="top-container">
     <div class="logo-group">
-      <span class="logo logo-sber-circle" aria-hidden="true"></span>
-      <span class="logo logo-cross" aria-hidden="true"></span>
-      <span class="logo logo-arch" aria-hidden="true"></span>
+      <span class="logo logo-white" aria-hidden="true"></span>
     </div>
 
     <button
@@ -42,7 +44,7 @@
   </header>
 
   <div class="content">
-    <div class="audioLayer">
+    <div class="audio-layer">
       <AudioWithCaptions
         src={audio.src}
         captions={audio.captions}
@@ -65,60 +67,8 @@
 
 <style>
   .guide-screen {
-    position: relative;
-    height: 100svh;
     min-height: 100dvh;
-    width: 100%;
-    background: var(--bg) center / cover no-repeat;
-    overflow: hidden;
-    color: rgba(254, 254, 252, 1);
-  }
-
-  .guide-screen::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255, 255, 255, 0.50);
-      pointer-events: none;
-  }
-
-  .guide-screen::after {
-      position: absolute;
-      content: '';
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background: url('/assets/woman.png') center/cover no-repeat;
-  }
-
-  .top-gradient,
-  .bottom-gradient {
-    position: absolute;
-    left: 0;
-    right: 0;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .top-gradient {
-    top: 0;
-    height: 210px;
-    background: linear-gradient(
-      180deg,
-      rgba(16, 13, 10, 0.85) 0%,
-      rgba(16, 13, 10, 0.25) 70%,
-      transparent 100%
-    );
-  }
-
-  .bottom-gradient {
-    bottom: 0;
-    height: 340px;
-    background: linear-gradient(
-      180deg,
-      rgba(16, 13, 10, 0) 0%,
-      rgba(16, 13, 10, 0.8) 100%
-    );
+    height: 100svh;
   }
 
   .top-container {
@@ -144,45 +94,9 @@
     background-size: contain;
   }
 
-  .logo-sber-circle {
-    width: 44px;
-    height: 44px;
-    background-image: url("/assets/logo-sber-circle.png");
-  }
-
-  .logo-cross {
-    width: 24px;
-    height: 1.5px;
-    background: #ffffff;
-    transform: rotate(-45deg);
-    position: relative;
-  }
-
-  .logo-cross::after {
-    content: "";
-    position: absolute;
-    width: 24px;
-    height: 1.5px;
-    background: #ffffff;
-    transform: rotate(90deg);
-  }
-
-  .logo-arch {
-    width: 44px;
-    height: 44px;
-    background-image: url("/assets/logo-arch.png");
-  }
-
   .content {
     position: relative;
     height: 100%;
-  }
-
-  .audioLayer {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
   }
 
   .content-card {

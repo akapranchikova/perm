@@ -111,9 +111,7 @@
 
   <footer class="footer" aria-label="Логотипы партнёров">
     <div class="logos">
-      <span class="logo logo-arch" aria-hidden="true"></span>
-      <span class="sep" aria-hidden="true">×</span>
-      <span class="logo logo-sber" aria-label="Сбер"></span>
+      <span class="logo logo-white" aria-hidden="true"></span>
       <span class="sep" aria-hidden="true">×</span>
       <span class="logo logo-giga" aria-label="ГигаЧат"></span>
     </div>
@@ -230,16 +228,7 @@
     background-size: contain;
     background-position: center;
   }
-  .logo-arch {
-    width: 44px;
-    height: 44px;
-    background-image: url("/assets/logo-arch.png");
-  }
-  .logo-sber {
-    width: 74px;
-    height: 20px;
-    background-image: url("/assets/logo-sber.png");
-  }
+
   .logo-giga {
     width: 92px;
     height: 28px;

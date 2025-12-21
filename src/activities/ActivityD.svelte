@@ -89,10 +89,10 @@
 
   // quiz 1 вопрос, 3 ответа (мокап “Вопрос по шару”)
   const quiz = {
-    question: "С какой целью Коровин изобразил этот шар на картине?",
+    question: "Как помог Коровину шар при написании «Настурций»?",
     imageUrl: "/quiz-d.jpg",
-    answers: ["Ответ 1", "Ответ 2", "Ответ 3"],
-    correctIndex: 1,
+    answers: ["Выстроить светотень", "Выстроить золотое сечение", "Подчеркнуть главного героя"],
+    correctIndex: 0,
   };
 
   let chosen = $state(null);
@@ -131,14 +131,12 @@
       <section class="screen screen--find">
         <div class="arch-bg"></div>
         <div class="screen-overlay"></div>
-        <div class="top-gradient"></div>
-        <div class="bottom-gradient"></div>
+        <div class="top-gradient" style="--gradient-z-index:-1;"></div>
+        <div class="bottom-gradient" style="--gradient-z-index:-1;"></div>
 
         <header class="topbar">
           <div class="logo-group">
-            <span class="logo logo-sber-circle" aria-hidden="true"></span>
-            <span class="logo logo-cross" aria-hidden="true"></span>
-            <span class="logo logo-arch" aria-hidden="true"></span>
+            <span class="logo {step === steps.QUIZ ? 'logo-brown' : 'logo-white' }" aria-hidden="true"></span>
           </div>
 
           <button
@@ -196,14 +194,12 @@
       <section class="screen screen--hero">
         <div class="arch-bg"></div>
         <div class="screen-overlay"></div>
-        <div class="top-gradient"></div>
-        <div class="bottom-gradient"></div>
+        <div class="top-gradient" style="--gradient-z-index:-1;"></div>
+        <div class="bottom-gradient" style="--gradient-z-index:-1;"></div>
 
         <header class="topbar">
           <div class="logo-group">
-            <span class="logo logo-sber-circle" aria-hidden="true"></span>
-            <span class="logo logo-cross" aria-hidden="true"></span>
-            <span class="logo logo-arch" aria-hidden="true"></span>
+            <span class="logo logo-white" aria-hidden="true"></span>
           </div>
 
           <button
@@ -242,9 +238,7 @@
       <section class="screen screen--quiz">
         <header class="topbar topbar--light">
           <div class="logo-group logo-group--accent">
-            <span class="logo logo-sber-circle" aria-hidden="true"></span>
-            <span class="logo logo-cross" aria-hidden="true"></span>
-            <span class="logo logo-arch" aria-hidden="true"></span>
+            <span class="logo logo-white 1" aria-hidden="true"></span>
           </div>
 
           <button
@@ -282,14 +276,12 @@
       <section class="screen screen--hero">
         <div class="arch-bg"></div>
         <div class="screen-overlay"></div>
-        <div class="top-gradient"></div>
-        <div class="bottom-gradient"></div>
+          <div class="top-gradient" style="--gradient-z-index:-1;"></div>
+          <div class="bottom-gradient" style="--gradient-z-index:-1;"></div>
 
         <header class="topbar">
           <div class="logo-group">
-            <span class="logo logo-sber-circle" aria-hidden="true"></span>
-            <span class="logo logo-cross" aria-hidden="true"></span>
-            <span class="logo logo-arch" aria-hidden="true"></span>
+            <span class="logo logo-white 2" aria-hidden="true"></span>
           </div>
 
           <button
@@ -381,25 +373,6 @@
       z-index: -2;
     }
 
-    .top-gradient,
-    .bottom-gradient {
-      position: absolute;
-      left: 0;
-      right: 0;
-      pointer-events: none;
-      z-index: -1;
-    }
-    .top-gradient {
-      top: 0;
-      height: 200px;
-      background: linear-gradient(180deg, rgba(16, 13, 10, 0.85) 0%, rgba(16, 13, 10, 0.2) 70%, transparent 100%);
-    }
-    .bottom-gradient {
-      bottom: 0;
-      height: 320px;
-      background: linear-gradient(180deg, rgba(16, 13, 10, 0) 0%, rgba(16, 13, 10, 0.82) 100%);
-    }
-
     .topbar {
       position: absolute;
       top: 18px;
@@ -415,6 +388,7 @@
     .topbar--light {
       position: relative;
       top: 0;
+      width: 100%;
       left: 0;
       right: 0;
       color: var(--txt-primary);
@@ -432,39 +406,11 @@
       background-size: contain;
       background-position: center;
     }
-    .logo-sber-circle {
-      width: 38px;
-      height: 38px;
-      background-image: url("/assets/logo-sber-circle.png");
-    }
-    .logo-cross {
-      width: 22px;
-      height: 1.5px;
-      background: currentColor;
-      transform: rotate(-45deg);
-      position: relative;
-    }
-    .logo-cross::after {
-      content: "";
-      position: absolute;
-      width: 22px;
-      height: 1.5px;
-      background: currentColor;
-      transform: rotate(90deg);
-    }
-    .logo-arch {
-      width: 38px;
-      height: 38px;
-      background-image: url("/assets/logo-arch.png");
-    }
 
     .logo-group--accent {
       color: #b2987e;
     }
-    .logo-group--accent .logo-sber-circle {
-      filter: invert(51%) sepia(6%) saturate(1524%) hue-rotate(348deg) brightness(92%) contrast(88%);
-    }
-    .logo-group--accent .logo-arch {
+    .logo-group--accent .logo-white {
       filter: invert(51%) sepia(6%) saturate(1524%) hue-rotate(348deg) brightness(92%) contrast(88%);
     }
 
@@ -562,20 +508,20 @@
     }
 
     .heroImage {
-      position: relative;
-      z-index: 1;
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 40px;
-      padding: 0 28px;
-      width: 100%;
     }
     .heroImage img {
-      width: min(86%, 360px);
-      max-height: 62vh;
-      object-fit: contain;
-      filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.32));
+      width: 100%;
+      max-height: 100%;
+      object-fit: cover;
     }
 
     .contentPanel {
@@ -611,21 +557,6 @@
       width: 100%;
       align-items: center;
     }
-    .quizTitle {
-      font-size: 28px;
-      line-height: 1.22;
-      font-weight: 500;
-      color: var(--txt-primary);
-      text-align: center;
-      max-width: 360px;
-    }
-    .answers {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-      max-width: 360px;
-    }
     .answerBtn {
       width: 100%;
       border-radius: 30px;
@@ -637,6 +568,41 @@
       color: #fefefc !important;
       border-color: #b2987e !important;
     }
+
+    .quizTitle {
+        color: var(--text-primary);
+        margin: 0 auto;
+        max-width: 520px;
+        font-family: Prata, serif;
+        font-weight: 400;
+        font-size: 32px;
+        line-height: 100%;
+        letter-spacing: 0;
+        text-align: center;
+
+    }
+
+    .answers {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        margin-top: 18px;
+        padding-bottom: 12px;
+    }
+
+    .answerBtn {
+        width: 100%;
+        border-radius: 999px;
+        padding: 14px 16px;
+        border: 1px solid rgba(178, 152, 126, 1);
+        background: rgba(254, 252, 248, 0.94);
+        color: rgba(178, 152, 126, 1);
+        font-size: 16px;
+        font-weight: 500;
+        transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.2s ease;
+    }
+
 
     .bottomBtn {
       width: 100%;

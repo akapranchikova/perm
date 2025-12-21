@@ -76,27 +76,16 @@
   {:else}
     <div class="safe quiz">
       <div class="topbar">
-        <div class="logo-group" aria-label="Поленов и Сбер">
-          <span class="logo logo-sber-circle" aria-hidden="true"></span>
-          <span class="logo logo-cross" aria-hidden="true"></span>
-          <span class="logo logo-arch" aria-hidden="true"></span>
+      <div class="logo-group" aria-label="Поленов и Сбер">
+          <span class="logo {stage === stages.QUESTION || stage === stages.STORY ? 'logo-brown' : 'logo-white'} " aria-hidden="true"></span>
         </div>
 
-        <button class="sound-btn" type="button" aria-label="Звук">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M11 5L6.5 9H3v6h3.5L11 19V5z"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M16 9c1.5 1.5 1.5 4.5 0 6"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
+        <button class="sound-btn sound-btn--light" type="button" aria-label="Звук">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 5V19L7 15H4C3.73478 15 3.48043 14.8946 3.29289 14.7071C3.10536 14.5196 3 14.2652 3 14V10C3 9.73478 3.10536 9.48043 3.29289 9.29289C3.48043 9.10536 3.73478 9 4 9H7L11 5Z" stroke="#B2987E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18.3599 5.64062C20.0453 7.32813 20.9919 9.61562 20.9919 12.0006C20.9919 14.3856 20.0453 16.6731 18.3599 18.3606" stroke="#B2987E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M15.54 8.46094C16.0057 8.92539 16.3751 9.47715 16.6272 10.0846C16.8792 10.6921 17.009 11.3433 17.009 12.0009C17.009 12.6586 16.8792 13.3098 16.6272 13.9173C16.3751 14.5247 16.0057 15.0765 15.54 15.5409" stroke="#B2987E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
         </button>
       </div>
 
@@ -187,52 +176,6 @@
       background-repeat: no-repeat;
       background-size: contain;
       background-position: center;
-    }
-
-    .logo-sber-circle {
-      width: 34px;
-      height: 34px;
-      background-image: url("/assets/logo-sber-circle.png");
-    }
-
-    .logo-cross {
-      width: 18px;
-      height: 1.5px;
-      background: var(--accent);
-      transform: rotate(-45deg);
-      position: relative;
-      opacity: 0.75;
-    }
-
-    .logo-cross::after {
-      content: "";
-      position: absolute;
-      width: 18px;
-      height: 1.5px;
-      background: var(--accent);
-      transform: rotate(90deg);
-      inset: 0;
-    }
-
-    .logo-arch {
-      width: 34px;
-      height: 34px;
-      background-image: url("/assets/logo-arch.png");
-    }
-
-    .sound-btn {
-      width: 42px;
-      height: 42px;
-      padding: 6px;
-      border-radius: 16px;
-      background: rgba(254, 252, 248, 0.85);
-      border: 1px solid var(--border-strong);
-      color: var(--accent);
-      display: grid;
-      place-items: center;
-      flex: 0 0 auto;
-      box-shadow: 0 12px 28px rgba(24, 22, 15, 0.08);
-      backdrop-filter: blur(16px);
     }
 
     .quote {
