@@ -176,24 +176,28 @@
 
     {#if step === steps.CITY && activeCity}
       <div class="topbar">
-        <div class="cityTitle">{activeCity.name}</div>
-        <button class="sound-btn" type="button" aria-label="Звук">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M11 5L6.5 9H3v6h3.5L11 19V5z"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M16 9c1.5 1.5 1.5 4.5 0 6"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
-        </button>
+          <div class="logo-group">
+              <span class="logo logo-brown" aria-hidden="true"></span>
+          </div>
+          <button class="sound-btn" type="button" aria-label="Звук">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path
+                          d="M11 5L6.5 9H3v6h3.5L11 19V5z"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linejoin="round"
+                  />
+                  <path
+                          d="M16 9c1.5 1.5 1.5 4.5 0 6"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                  />
+              </svg>
+          </button>
       </div>
+        <div class="cityTitle">{activeCity.name}</div>
+
 
       <div class="guideRow">
         <img class="avatar" src={trip1899.guideAvatarUrl} alt="" />
@@ -308,27 +312,30 @@
     }
 
     .card {
-      background: rgba(214, 234, 251, 0.55);
-      border: 1px solid rgba(17, 24, 39, 0.06);
-      border-radius: 18px;
-      backdrop-filter: blur(10px);
+        background: transparent;
+        border: none;
+      border-radius: 24px;
+        padding: 0;
     }
 
     .header .title {
-      font-weight: 800;
-      font-size: 20px;
-      color: rgba(17, 24, 39, 0.92);
+      color: rgba(24, 22, 15, 1);
+        font-family: Prata, serif;
+        font-weight: 400;
+        font-size: 28px;
+        line-height: 120%;
+        letter-spacing: 0;
+        text-align: center;
+
     }
 
     .mapCard {
-      padding: 10px;
     }
     .map {
       position: relative;
       border-radius: 16px;
       overflow: hidden;
       aspect-ratio: 3 / 4;
-      background: rgba(0, 0, 0, 0.04);
     }
     .mapImg {
       width: 100%;
@@ -399,11 +406,14 @@
     }
 
     .hint {
-      text-align: center;
-      font-size: 12px;
-      color: rgba(17, 24, 39, 0.6);
+      color: rgba(24, 22, 15, 1);
       white-space: pre-line;
-      font-weight: 700;
+        font-family: Inter, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 120%;
+        text-align: center;
+
     }
 
     .topbar {
@@ -415,26 +425,11 @@
     }
     .cityTitle,
     .finalTitle {
-      font-weight: 800;
-      font-size: 20px;
-      color: rgba(17, 24, 39, 0.92);
-      line-height: 1.1;
-      white-space: pre-line;
-    }
-    .sound-btn {
-      width: 36px;
-      height: 36px;
-      padding: 6px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.55);
-      border: 1px solid rgba(17, 24, 39, 0.08);
-      color: rgba(17, 24, 39, 0.65);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      box-shadow: none;
-      backdrop-filter: blur(8px);
+        font-family: Prata, serif;
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 120%;
+
     }
 
     .guideRow {
