@@ -163,8 +163,6 @@ body {
 }
 
 .sound-btn.muted {
-  border-color: rgba(255, 252, 248, 0.3);
-  background: rgba(0, 0, 0, 0.35);
   opacity: 0.85;
 }
 
@@ -185,11 +183,10 @@ body {
   display: flex;
   gap: 12px;
   align-items: center;
-  padding: 6px 16px 6px 6px;
+  padding: 4px 16px 4px 4px;
   border-radius: var(--radius-pill);
   background: rgba(178, 152, 126, 0.82);
   color: #fefcf8;
-  box-shadow: 0 10px 22px rgba(24, 22, 15, 0.18);
 }
 
 .quote .avatar {
@@ -207,7 +204,7 @@ body {
 
 .quote .bubbleText {
   font-size: 14px;
-  line-height: 1.3;
+  line-height: 1;
   color: #fefcf8;
   font-family: "Inter", sans-serif;
   font-weight: 500;

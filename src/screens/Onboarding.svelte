@@ -98,12 +98,16 @@
             primaryLabel: 'Далее',
             primaryAction: 'next',
             audio: {
-                src: '/audio/onboarding-welcome.wav',
+                src: '/audio/6947c985c3b4a2000115d31f_tts2_result.mp3',
                 captions: [
                     {
                         t: 0,
                         text:
-                            'Приветствуем на выставке «Поленов и ученики»! Мы, AI-гиды Сбера расскажем о наследии Поленова.'
+                            'Приветствуем на выставке «Поленов и ученики»!'
+                    },
+                    {
+                        t: 1.2,
+                        text: ' Мы, AI-гиды Сбера расскажем о наследии Поленова.'
                     }
                 ]
             }
@@ -114,7 +118,7 @@
             primaryLabel: 'Начать',
             primaryAction: 'start',
             audio: {
-                src: '/audio/onboarding-journey.wav',
+                src: '/audio/6947ca47c3b4a2000115d342_tts2_result.mp3',
                 captions: [
                     {
                         t: 0,

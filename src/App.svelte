@@ -8,6 +8,7 @@
   import Onboarding from './screens/Onboarding.svelte'
 
   import ActivityA from './activities/ActivityA.svelte';
+  import ActivityF from './activities/ActivityF.svelte';
   import ActivityB from './activities/ActivityB.svelte';
   import ActivityC from './activities/ActivityC.svelte';
   import ActivityD from './activities/ActivityD.svelte';
@@ -26,6 +27,8 @@
     <Playtests />
   {:else if $router.name === routes.ACTIVITY_A}
     <ActivityA />
+  {:else if $router.name === routes.ACTIVITY_F}
+    <ActivityF />
   {:else if $router.name === routes.ACTIVITY_B}
     <ActivityB />
   {:else if $router.name === routes.ACTIVITY_C}

@@ -10,6 +10,14 @@ export const artifactsCatalog = [
     caption: 'Белила',
   },
   {
+    id: 'sun-proof-whites-1',
+    name: 'Освещённость картины Больная',
+    description: 'Эскиз картины',
+    image: '/artifacts/belila.png',
+    activityRoute: routes.ACTIVITY_F,
+    caption: 'Эскиз',
+  },
+  {
     id: 'memoir-letter',
     name: 'Письмо ученика',
     description: 'Лист с воспоминаниями, который удалось поймать в AR',

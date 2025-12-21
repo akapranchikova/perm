@@ -10,6 +10,7 @@
 
   const items = [
     { id: routes.ACTIVITY_A, title: 'Пастух со стадом', desc: 'Егише Татевосян', image: '/activityA/frame_0003.png', floor: 2 },
+    { id: routes.ACTIVITY_F, title: 'Больная', desc: 'Василий Поленов', image: '/activityA/frame_0001.png', floor: 2 },
     { id: routes.ACTIVITY_B, title: 'Приветственный адрес Поленову от учеников', desc: null, image: '/activityB/background.png', floor: 1 },
     { id: routes.ACTIVITY_C, title: 'Музыкальная рукопись «Анна Бретонская»', desc: 'Василий Поленов', image: '/painting.png', floor: 1 },
     { id: routes.ACTIVITY_D, title: 'Настурции', desc: 'Константин Коровин', image: '/painting-d.png', floor: 2 },

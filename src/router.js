@@ -5,6 +5,7 @@ export const routes = /** @type {const} */ ({
   INTRO: "INTRO",
   PLAYTESTS: "PLAYTESTS",
   ACTIVITY_A: "ACTIVITY_A",
+  ACTIVITY_F: "ACTIVITY_F",
   ACTIVITY_B: "ACTIVITY_B",
   ACTIVITY_C: "ACTIVITY_C",
   ACTIVITY_D: "ACTIVITY_D",

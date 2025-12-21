@@ -148,16 +148,12 @@ function initSceneObjects() {
   function handleTap(e) {
     if (!camera || !scene || collectedCount >= TARGET_COUNT) return;
 
-    // Нормализация координат тапа
-    const rect = canvasEl.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    const x = (e.clientX / window.innerWidth) * 2 - 1;
+    const y = -(e.clientY / window.innerHeight) * 2 + 1;
 
     pointer.set(x, y);
     raycaster.setFromCamera(pointer, camera);
 
-    // Ищем пересечения. Важно: ищем и хитбоксы тоже
-    // Собираем все меши бумаг для проверки
     const targets = [];
     papersData.forEach(p => {
       if (!p.isCollected && p.mesh.visible) targets.push(p.mesh);
@@ -208,17 +204,16 @@ function initSceneObjects() {
       scene = s; camera = c; renderer = r;
       
       initSceneObjects();
-      
-      // Синхронизируем рендерер с прозрачностью для затемнения фона
       renderer.alpha = true; 
       
-      canvasEl.addEventListener('click', handleTap);
+      // ВЕШАЕМ НА WINDOW, а не на canvasEl
+      window.addEventListener('click', handleTap); 
     },
     onRender: () => {
       if(clock) animate(clock.getElapsedTime());
     },
     onStop: () => {
-      canvasEl?.removeEventListener('click', handleTap);
+      window.removeEventListener('click', handleTap); // Удаляем с window
       // Очистка сцены
       papersData.forEach(p => scene.remove(p.mesh));
       papersData = [];
@@ -329,24 +324,28 @@ function initSceneObjects() {
 {/if}
 
 <style>
-  /* Контейнер на весь экран */
+/* Было background: #000; -> Стало transparent */
   .xr-container {
     position: fixed;
     inset: 0;
     z-index: 50;
-    background: #000;
+    background: transparent; /* ВАЖНО: Прозрачный фон */
     overflow: hidden;
     font-family: 'Helvetica Neue', sans-serif;
+    pointer-events: none; /* Пропускаем клики сквозь контейнер, если нужно */
   }
 
+  /* Канвас пусть управляется 8th Wall, но мы зададим ему базу */
   .xr-canvas {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    outline: none;
+    position: fixed !important; /* Фиксируем жестко */
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: -1 !important; /* Уводим на самый задний план */
+    object-fit: cover;
   }
-
+  
   /* Затемнение реального мира */
   .dim-layer {
     position: absolute;
@@ -361,11 +360,11 @@ function initSceneObjects() {
     position: absolute;
     inset: 0;
     z-index: 10;
-    pointer-events: none; /* Чтобы клики проходили к канвасу, где нет кнопок */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 24px;
+    pointer-events: none; /* Сам слой прозрачен для кликов */
   }
 
   /* Счетчик сверху */
@@ -416,6 +415,11 @@ function initSceneObjects() {
     justify-content: center;
     padding-bottom: 40px;
     pointer-events: auto; /* Включаем клики для кнопки */
+  }
+
+    /* Включаем клики обратно для интерактивных элементов */
+  .bottom-controls, .counter-box {
+    pointer-events: auto; 
   }
 
   .hint {

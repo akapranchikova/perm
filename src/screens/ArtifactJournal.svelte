@@ -117,7 +117,7 @@
   .slider {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: 100vw;
+    grid-auto-columns: calc(100vw - 40px);
     gap: 16px;
     overflow-x: auto;
     padding: clamp(4px, 1vh, 8px) 2px clamp(8px, 2vh, 12px);
@@ -140,6 +140,8 @@
   .card {
     width: 100%;
     border-radius: 22px;
+    height: 100%;
+    border: none;
     padding: clamp(12px, 2vh, 16px);
     display: flex;
     flex-direction: column;
@@ -200,16 +202,16 @@
 
   .footer {
     display: flex;
-      flex-direction: column;
+    flex-direction: column;
     align-items: center;
     gap: 12px;
-    margin-top: clamp(8px, 2vh, 12px);
+    margin-top: 0;
+    padding: 0;
   }
 
   .progress {
     font-weight: 400;
-      font-size: 14px;
-      margin-top: clamp(10px, 2vh, 16px);
+    font-size: 14px;
     color: rgba(24, 22, 15, 0.7);
     text-align: center;
   }

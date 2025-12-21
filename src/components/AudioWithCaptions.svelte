@@ -1,5 +1,5 @@
 <script>
-  import { onDestroy } from 'svelte';
+  import { onDestroy } from "svelte";
 
   export let src;
   export let captions = []; // [{t, text}]
@@ -7,7 +7,7 @@
   export let muted = false;
 
   let audio;
-  let current = '';
+  let current = "";
 
   let raf;
   function tick() {
@@ -15,7 +15,7 @@
     const t = audio.currentTime || 0;
 
     // находим последнюю caption где caption.t <= t
-    let text = '';
+    let text = "";
     for (let i = 0; i < captions.length; i++) {
       if (captions[i].t <= t) text = captions[i].text;
       else break;
@@ -34,6 +34,8 @@
   }
 
   $: if (audio && src) {
+    console.log("Audio changed! : " + src);
+
     // при смене трека
     audio.pause();
     audio.currentTime = 0;
@@ -42,7 +44,7 @@
 
     if (autoplay) {
       audio.play().catch(() => {
-        // на мобиле автоплей может быть запрещён — оставим как есть
+        console.log("Audio autoplay disabled");
       });
     }
     startLoop();
@@ -58,17 +60,18 @@
 {/if}
 
 <style>
-  .captions{
+  .captions {
     position: absolute;
-    left: 16px; right: 16px;
+    left: 16px;
+    right: 16px;
     bottom: 90px;
     padding: 10px 12px;
     border-radius: 14px;
-      color: rgba(254, 254, 252, 0.96);
-      text-align: center;
-      line-height: 1.24;
-      font-size: 18px;
-      font-family: "Inter", sans-serif;
-      backdrop-filter: none;
+    color: rgba(254, 254, 252, 0.96);
+    text-align: center;
+    line-height: 1.24;
+    font-size: 18px;
+    font-family: "Inter", sans-serif;
+    backdrop-filter: none;
   }
 </style>

@@ -6,7 +6,7 @@
   import XR8Scene from './XR8Scene.svelte';
   import ActivityShell from '../components/ActivityShell.svelte';
   import { getArtifactForActivity } from '../data/artifacts';
-
+  
   // шаги
   const steps = /** @type {const} */ ({
     INTRO: 'INTRO',
@@ -24,6 +24,31 @@
     imageAlt: "Приветственный адрес Поленову от учеников",
     floorLabel: "1 этаж",
     buttonText: "Начать",
+  };
+
+  const guide = {
+    buttonText: "Далее",
+    audio: {
+      src: "/activityB/6947c3f2c84c4900013533c0_tts2_result.mp3",
+      captions: [
+        {
+          t: 0,
+          text:
+            "В XIX веке наша Академия называлась Московским училищем живописи, ваяния и зодчества. Здесь Поленов преподавал 13 лет."
+        },
+        { 
+          t: 1,
+          text:
+            "Этот приветственный адрес ученики подарили Василию Дмитриевичу, когда он покидал должность преподавателя. Для них это было прощанием с эпохой. ",
+        },
+        { 
+          t: 2,
+          text:
+            "Поленов говорил, что научить ремеслу легко. Труднее — дать таланту раскрыться. Но именно это он и делал, и его влияние сложно переоценить. ",
+        },
+      ],
+      autoplay: true,
+    },
   };
 
   // индекс текущего воспоминания (0..n-1)
@@ -62,7 +87,7 @@
   }
 </script>
 
-<ActivityShell {intro}>
+<ActivityShell {intro} {guide}>
   <div class="safe activityB">
 
     <!-- XR слой (fixed) — показываем только когда step === AR -->
