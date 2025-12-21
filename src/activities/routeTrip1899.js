@@ -1,8 +1,8 @@
 export const trip1899 = {
   title: 'Восточная поездка 1899 г.',
-  mapUrl: '/activityE/map.png',
+  mapUrl: '/travelerMap.svg',
   guideAvatarUrl: '/activityE/guide.png',
-  hint: 'Нажимай на неизвестные точки на карте\nчтобы узнать полный маршрут',
+  hint: 'Нажимайте на неизвестные точки на карте и узнайте о маршруте и заметках путешественника',
 
   // 3 точки: позиция в процентах (0..100) внутри области карты
   cities: [
@@ -10,38 +10,50 @@ export const trip1899 = {
       id: 'Cairo',
       name: 'Каир',
       pos: { x: 58, y: 18 },
-      audioUrl: '/activityRoute/audio_kiev.mp3',
+      audioUrl: '/audio/onboarding-journey.wav',
       captions: [
-        { t: 0.0, text: 'Киев встретил нас светом и просторным небом…' },
-        { t: 4.5, text: 'Я писал в письме о дороге и людях…' }
+        { t: 0.0, text: 'Сюжет восточной поездки наглядно показывал ученикам, как Поленов работал с натурой.' },
+        { t: 5.5, text: 'Край света и песок на снимках напоминали мне о его поисках света.' }
       ],
-      media: ['/activityRoute/city_kiev_1.jpg', '/activityRoute/city_kiev_2.jpg'],
-      letterLines: ['которые когда-то', 'закладывал Василий', 'Дмитриевич Поленов']
+      media: ['/painting.png'],
+      videoPoster: '/painting.png',
+      videoUrl: '/StartLoading/6944fe39e6e2ba74169403b6_result.mp4',
+      letterLines: ['Снимки восточной поездки', 'показывали ученикам, как искать', 'свет и фактуру в реальных городах.']
     },
     {
       id: 'Jerusalem',
       name: 'Иерусалим',
       pos: { x: 62, y: 30 },
-      audioUrl: '/activityRoute/audio_odessa.mp3',
-      captions: [{ t: 0, text: 'В Одессе шум портового города…' }],
-      media: ['/activityRoute/city_odessa_1.jpg', '/activityRoute/city_odessa_2.jpg'],
-      letterLines: ['несколько предложений', 'из письма о поездке']
+      audioUrl: '/audio/onboarding-welcome.wav',
+      captions: [
+        { t: 0, text: 'Поленов любил показывать ученикам город с его куполами и шумными улицами.' },
+        { t: 5, text: 'Каждая зарисовка становилась учебным материалом.' }
+      ],
+      media: ['/painting-d.png'],
+      videoPoster: '/painting-d.png',
+      videoUrl: '/StartLoading/6944fe39e6e2ba74169403b6_result.mp4',
+      letterLines: ['Поленов показывал на примере Иерусалима,', 'как заметки из путешествий', 'превращаются в будущие картины.']
     },
     {
       id: 'Constantinople',
       name: 'Константинополь',
       pos: { x: 54, y: 46 },
-      audioUrl: '/activityRoute/audio_istanbul.mp3',
-      captions: [{ t: 0, text: 'Константинополь — дыхание Востока…' }],
-      media: ['/activityRoute/city_istanbul_1.jpg', '/activityRoute/city_istanbul_2.jpg'],
-      letterLines: ['аудио + субтитры', 'и лёгкие шумы местности']
+      audioUrl: '/audio/onboarding-welcome.wav',
+      captions: [
+        { t: 0, text: 'Художник наглядно показывал ученикам, что путешествие — источник вдохновения.' }
+      ],
+      media: ['/book.png'],
+      videoPoster: '/book.png',
+      videoUrl: '/StartLoading/6944fe39e6e2ba74169403b6_result.mp4',
+      letterLines: ['Художник наглядно показывал ученикам,', 'что путешествие — источник вдохновения.']
     }
   ],
 
   final: {
-    title: 'Отлично!\nТеперь ты узнал…',
-    imageUrl: '/activityRoute/final.jpg',
-    textLines: ['которые когда-то закладывал', 'Василий Дмитриевич Поленов.', 'Мы изучаем его наследие и'],
-    button: 'За новым секретом'
+    title: 'Маршрут окончен!',
+    imageUrl: '/guides.png',
+    backgroundUrl: '/guides.png',
+    text: 'Маршрут окончен! Надеюсь, вы сохранили себе пару точек для будущего путешествия?',
+    button: 'Завершить'
   }
 };

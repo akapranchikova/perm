@@ -155,8 +155,9 @@ body {
   padding: 0;
   border: 1px solid rgba(255, 252, 248, 0.6);
   background: transparent;
-  display: grid;
-  place-items: center;
+  display: flex;
+    justify-content: center;
+    align-items: center;
   cursor: pointer;
   color: #fefcfc;
   transition: opacity 0.2s ease;
@@ -170,8 +171,6 @@ body {
   background: rgba(254, 252, 248, 0.16);
   border: 1px solid rgba(24, 22, 15, 0.12);
   color: var(--text-primary);
-  box-shadow: 0 8px 18px rgba(24, 22, 15, 0.12);
-  backdrop-filter: blur(10px);
 }
 
 .sound-btn img {

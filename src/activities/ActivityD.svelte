@@ -468,22 +468,6 @@
       filter: invert(51%) sepia(6%) saturate(1524%) hue-rotate(348deg) brightness(92%) contrast(88%);
     }
 
-    .sound-btn {
-      width: 48px;
-      height: 46px;
-      padding: 0;
-    }
-    .sound-btn--light {
-      background: rgba(255, 255, 255, 0.8);
-      border-color: rgba(178, 152, 126, 0.45);
-      width: 44px;
-      height: 44px;
-      color: var(--text-primary);
-      box-shadow: 0 8px 18px rgba(24, 22, 15, 0.12);
-    }
-    .sound-btn--light img {
-      filter: invert(28%) sepia(10%) saturate(773%) hue-rotate(350deg) brightness(96%) contrast(91%);
-    }
 
     .paintingShell {
       position: absolute;
