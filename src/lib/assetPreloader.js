@@ -1,5 +1,11 @@
 const imageAssets = [
   '/StartLoading/start-bg.jpg',
+  '/activityList/01.png',
+  '/activityList/02.png',
+  '/activityList/03.png',
+  '/activityList/04.png',
+  '/activityList/05.png',
+  '/activityList/06.png',
   '/activityA/frame_0001.png',
   '/activityA/frame_0002.png',
   '/activityA/frame_0003.png',
@@ -13,27 +19,24 @@ const imageAssets = [
   '/activityE/guide.png',
   '/activityE/map.png',
   '/artifacts/belila.png',
-  '/assets/logo-giga.png',
+  '/artifacts/ball.png',
+  '/artifacts/draft.png',
+  '/artifacts/mark.png',
+  '/artifacts/skitze.png',
+  '/artifacts/tablet.png',
   '/assets/logo-white.png',
   '/assets/sound.svg',
   '/avatar.png',
   '/book.png',
   '/guide.png',
   '/guides.png',
-  '/images/Polenov_by_Repin.png',
-  '/images/background1.png',
-  '/images/background2.png',
-  '/images/gigachat.png',
-  '/images/headphones.png',
-  '/images/onboarding-couple.png',
-  '/painting-d.png',
-  '/painting.png',
   '/travelerMap.svg'
 ];
 
 const audioAssets = ['/audio/onboarding-journey.wav', '/audio/onboarding-welcome.wav'];
 
 function preloadImage(src) {
+    console.log('preloadImage');
   return new Promise((resolve) => {
     const img = new Image();
     const settle = () => resolve({ src, status: 'ok' });

@@ -10,7 +10,28 @@
 
     let {
         src = "",
+        // Цвет, которым маркерная точка помечена на svg-карте
         pointColor = "#ff0000",
+        /*
+        Массив информации о точках:
+        [
+            {
+                // id circle-точки-метки на svg-карте
+                id: 'Constantinople',
+                // Здесь на входе надо просто написать null, так как координаты неизвестны заранее
+                poit: null,
+                // Подпись а карте
+                title: 'Константинополь',
+                // 'top'|'left'|'right'|'bottom'
+                titlePosition: 'right',
+                // На входе должно быть false, признак замены точки значком посещения/не посещения
+                isOnMap: false,
+                // Признак посещённости точки (города на карте)
+                isOpened: false
+            },
+            ...
+        ]
+        */
         pointsInfo = [],
         alt = "",
         onTap = () => {},
@@ -180,7 +201,7 @@
 
     function updatePointsInfo(foundPoints) {
         if (!Array.isArray(pointsInfo)) {
-            console.error("pointsInfo не массив");
+            console.error("pointsInfo - не массив");
             return;
         }
 
@@ -217,7 +238,7 @@
 
         containerSize = {
             width: containerWidth, 
-            eight: containerHeight
+            height: containerHeight
         };
 
         const scaleX = containerWidth / canvasSize.width;
@@ -356,16 +377,7 @@
         />
         <div class="loading">Загрузка карты...</div>
     {:else}
-        <div
-            class="map-container"
-            style="
-                position: relative;
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;"
-        >
+        <div class="map-container">
             <img
                 {src}
                 {alt}
@@ -397,7 +409,7 @@
                                 <svg
                                     width={CHECK_ICON_SIZE}
                                     height={CHECK_ICON_SIZE}
-                                    viewBox="0 0 16 16"
+                                    viewBox="0 0 {CHECK_ICON_SIZE} {CHECK_ICON_SIZE}"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
                                 >
@@ -442,7 +454,7 @@
                                 <svg
                                     width={POINT_ICON_SIZE}
                                     height={POINT_ICON_SIZE + 1}
-                                    viewBox="0 0 12 13"
+                                    viewBox="0 0 {POINT_ICON_SIZE} {POINT_ICON_SIZE + 1}"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
                                 >
@@ -483,6 +495,12 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .map-point {

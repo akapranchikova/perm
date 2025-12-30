@@ -1,25 +1,31 @@
 <script>
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+  import { onMount, onDestroy, createEventDispatcher } from "svelte";
+  import { settings } from "../stores/settings"; 
 
   export let running = false;
+  // Этот параметр скрывает слоты и надписи, когда мы переходим к просмотру видео
+  export let showUI = true; 
   export let memories = [];
-  export let overlaySrc = '/activityB/overlay.mp4'; // замените на ваш ролик
+  export let overlaySrc = "/activityB/overlay.mp4";
   export let maxSlots = 3;
+  export let stopTimings = [];
 
   const dispatch = createEventDispatcher();
 
   let cameraEl;
+  let overlayVideoEl;
   let stream;
   let collected = [];
+  let shouldShowCollected = [];
   let catchAudio;
-  let errorMsg = '';
+  let errorMsg = "";
 
   async function startStream() {
     if (stream || !running) return;
 
     try {
       stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
+        video: { facingMode: "environment" },
         audio: false,
       });
 
@@ -27,9 +33,14 @@
         cameraEl.srcObject = stream;
         await cameraEl.play();
       }
+      // Запускаем видео оверлея только если нужен UI
+      if (overlayVideoEl && showUI) {
+        overlayVideoEl.currentTime = 0;
+        overlayVideoEl.play().catch(() => {});
+      }
     } catch (err) {
-      errorMsg = 'Не удалось получить доступ к камере';
-      dispatch('error', err);
+      errorMsg = "Не удалось получить доступ к камере";
+      dispatch("error", err);
     }
   }
 
@@ -37,29 +48,52 @@
     stream?.getTracks().forEach((track) => track.stop());
     stream = null;
     if (cameraEl) cameraEl.srcObject = null;
+    if (overlayVideoEl) overlayVideoEl.pause();
   }
 
   function resetState() {
     collected = [];
-    errorMsg = '';
+    shouldShowCollected = [];
+    errorMsg = "";
+    if (overlayVideoEl) overlayVideoEl.currentTime = 0;
   }
 
   function playCatchSfx() {
+    if (!$settings.audioEnabled) {
+      return;
+    }
+
     if (!catchAudio) {
-      catchAudio = new Audio('/activityB/paper-catch.mp3'); // положите сюда звук шуршания
+      catchAudio = new Audio("/activityB/paper-catch.mp3");
     }
     catchAudio.currentTime = 0;
     catchAudio.play?.().catch(() => {});
   }
 
-  function handleTap() {
-    if (!running || errorMsg) return;
+  function handleVideoTimeUpdate() {
+    if (!overlayVideoEl || !stopTimings.length) return;
+    const targetTime = stopTimings[collected.length];
     if (collected.length >= maxSlots) return;
+
+    if (targetTime && overlayVideoEl.currentTime >= targetTime) {
+      overlayVideoEl.pause();
+      overlayVideoEl.currentTime = targetTime;
+    }
+  }
+
+  function handleTap() {
+    // Не реагируем на клики, если UI скрыт (режим просмотра)
+    if (!running || errorMsg || !showUI) return;
+    if (collected.length >= maxSlots) return;
+
+    if (overlayVideoEl && !overlayVideoEl.paused) {
+      return;
+    }
 
     const fallback = {
       name: `Воспоминание ${collected.length + 1}`,
-      role: 'Ученик',
-      excerpt: '...',
+      role: "Ученик",
+      excerpt: "...",
     };
 
     const memory =
@@ -68,19 +102,33 @@
       fallback;
 
     collected = [...collected, memory];
+    setTimeout(() => {
+      shouldShowCollected = [...shouldShowCollected, true];
+    }, 1500);
     playCatchSfx();
-    dispatch('catch', { memory, count: collected.length });
+    dispatch("catch", { memory, count: collected.length });
+
+    if (overlayVideoEl) {
+      overlayVideoEl.play().catch(() => {});
+    }
 
     if (collected.length === maxSlots) {
-      setTimeout(() => dispatch('complete'), 600);
+      setTimeout(() => dispatch("complete"), 4500);
     }
   }
 
   $: if (running) {
-    resetState();
-    startStream();
+    if (!stream) {
+        resetState();
+        startStream();
+    }
   } else {
     stopStream();
+  }
+
+  // Если UI выключили (перешли к просмотру), ставим оверлей на паузу
+  $: if (!showUI && overlayVideoEl) {
+      overlayVideoEl.pause();
   }
 
   onMount(() => {
@@ -91,52 +139,54 @@
 </script>
 
 {#if running}
-  <div class="cameraCatch" on:click={handleTap} role="button" aria-label="Поймать воспоминание">
-    <video class="cameraFeed" bind:this={cameraEl} autoplay playsinline muted></video>
-    <div class="dim"></div>
+  <div
+    class="cameraCatch"
+    on:click={handleTap}
+    role="button"
+    aria-label="Поймать воспоминание"
+  >
+    <video class="cameraFeed" bind:this={cameraEl} autoplay playsinline muted
+    ></video>
+    
+    <!-- Затемнение фона: светлее при просмотре видео (0.4), темнее при ловле (0.55) -->
+    <div class="dim" style="background: rgba(0, 0, 0, {showUI ? 0.55 : 0.4});"></div>
 
-    {#if overlaySrc}
-      <video
-        class="overlayVideo"
-        src={overlaySrc}
-        autoplay
-        loop
-        muted
-        playsinline
-      ></video>
-    {/if}
-
-    <div class="content">
-      <div class="topInfo">
-        <div class="title">Поймайте воспоминание</div>
-        <div class="counter">{collected.length}/{maxSlots}</div>
-      </div>
-
-      <div class="hint">
-        {#if collected.length < maxSlots}
-          Тапните в любом месте экрана
-        {:else}
-          Все воспоминания собраны
+    {#if showUI}
+        {#if overlaySrc}
+        {#key overlaySrc}
+            <video
+            class="overlayVideo"
+            bind:this={overlayVideoEl}
+            src={overlaySrc}
+            muted
+            playsinline
+            on:timeupdate={handleVideoTimeUpdate}
+            ></video>
+        {/key}
         {/if}
-      </div>
 
-      <div class="slots">
-        {#each Array(maxSlots) as _, i}
-          <div class="slot" class:filled={!!collected[i]}>
-            {#if collected[i]}
-              <div class="slotName">{collected[i].name}</div>
-              <div class="slotRole">{collected[i].role}</div>
-            {:else}
-              <div class="slotPlaceholder">Пусто</div>
-            {/if}
-          </div>
-        {/each}
-      </div>
+        <div class="content">
+            <div class="slots">
+                {#each Array(maxSlots) as _, i}
+                <div class="slot" class:filled={!!collected[i]}>
+                    {#if collected[i] && shouldShowCollected[i]}
+                    <img src={collected[i].portraitUrl} alt={collected[i].name}/>
+                    {:else}
+                    <div class="slotPlaceholder"></div>
+                    {/if}
+                </div>
+                {/each}
+            </div>
 
-      {#if errorMsg}
-        <div class="error">{errorMsg}</div>
-      {/if}
-    </div>
+            <div class="hint">
+                {#if errorMsg}
+                {errorMsg}
+                {:else}
+                Поймайте несколько воспоминаний учеников Поленова
+                {/if}
+            </div>
+        </div>
+    {/if}
   </div>
 {/if}
 
@@ -146,7 +196,7 @@
     inset: 0;
     z-index: 60;
     overflow: hidden;
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     color: #fff;
   }
 
@@ -161,8 +211,8 @@
   .dim {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(2px);
+    transition: background 0.5s ease;
   }
 
   .overlayVideo {
@@ -170,10 +220,12 @@
     top: 10vh;
     left: 50%;
     transform: translateX(-50%);
-    width: min(90vw, 500px);
+    width: max(90vw, 500px);
+    object-fit: cover;
+    height: 90vh;
     border-radius: 24px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-    opacity: 0.9;
+    opacity: 1;
     mix-blend-mode: screen;
   }
 
@@ -187,73 +239,46 @@
     gap: 20px;
   }
 
-  .topInfo {
-    position: absolute;
-    top: 30px;
-    left: 0;
-    width: 100%;
-    padding: 0 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .title {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-
-  .counter {
-    font-size: 14px;
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
   .hint {
     text-align: center;
-    font-size: 15px;
-    opacity: 0.9;
+    min-height: 20px;
+    font-family: Inter;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 124%;
+    color: var(--txt-white);
   }
 
   .slots {
     display: flex;
     gap: 12px;
+    max-width: 500px; 
+    margin: 0 auto;
   }
 
   .slot {
     flex: 1;
     aspect-ratio: 1 / 1;
     border-radius: 18px;
-    border: 1px dashed rgba(255, 255, 255, 0.35);
-    background: rgba(255, 255, 255, 0.08);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    padding: 10px;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
     transition: 0.3s;
+    width: 80px;
+    height: 80px;
+    border-radius: 18px;
+    padding: 3px;
+    border: 1px solid #FFFCF8;
   }
 
-  .slot.filled {
-    border-style: solid;
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-  }
-
-  .slotName {
-    font-weight: 700;
-    font-size: 13px;
-    line-height: 1.2;
-  }
-
-  .slotRole {
-    margin-top: 4px;
-    font-size: 11px;
-    opacity: 0.8;
+  .slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
   .slotPlaceholder {
@@ -261,11 +286,5 @@
     opacity: 0.6;
     text-transform: uppercase;
     letter-spacing: 1px;
-  }
-
-  .error {
-    text-align: center;
-    font-size: 14px;
-    color: #ffb4b4;
   }
 </style>

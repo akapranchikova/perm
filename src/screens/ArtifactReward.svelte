@@ -1,6 +1,10 @@
 <script>
   import { onMount } from "svelte";
   import { router, routes } from "../router";
+
+  import { assetsStore } from '../stores/assets';
+  $: getSrc = (src) => $assetsStore.get(src) || src;
+
   import {
       artifactsCatalog,
       getArtifactById, getArtifactForActivity,
@@ -44,8 +48,8 @@
     </div>
 
     <div class="artifact-frame">
-      <div class="arch">
-        <img src={artifact?.image} alt={artifact?.name} loading="lazy" />
+      <div class="arch {artifact?.id}">
+        <img src={getSrc(artifact?.image)} alt={artifact?.name} />
       </div>
     </div>
 
@@ -61,8 +65,9 @@
   .reward-screen {
     position: relative;
     width: 100%;
-    min-height: 100vh;
+    height: 100dvh;
     background: #fdfaf5;
+    overscroll-behavior: none;
     color: rgba(24, 22, 15, 1);
     overflow: hidden;
     display: flex;
@@ -74,7 +79,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 26px 20px 10px;
+    padding: 20px 20px 0;
     color: #fff;
   }
 
@@ -104,10 +109,10 @@
   }
 
   .content {
-    padding: clamp(18px, 4vh, 26px) 22px clamp(20px, 5vh, 32px);
+    padding: 14px 22px clamp(20px, 5vh, 32px) clamp(18px, 2vh, 26px);
     display: flex;
     flex-direction: column;
-    gap: clamp(14px, 3vh, 24px);
+    gap: 20px;
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -118,24 +123,26 @@
   .text-block {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 6px;
+    gap: 5px;
+    margin-top: 0;
     max-width: 480px;
-    padding: 0 clamp(4px, 2vw, 12px);
+    padding: 0;
   }
 
   h1 {
     margin: 0;
     font-family: "Prata", "Times New Roman", serif;
-    font-size: 30px;
-    line-height: 1.25;
+      font-weight: 400;
+      font-size: 32px;
+      line-height: 100%;
+      text-align: center;
   }
 
   p {
     margin: 0;
     font-size: 16px;
-    line-height: 1.35;
-    color: rgba(24, 22, 15, 0.76);
+    line-height: 1.2;
+    color: rgba(95, 93, 90, 1);
   }
 
   .artifact-frame {
@@ -146,20 +153,55 @@
     display: flex;
     flex-direction: column;
     gap: clamp(10px, 2vh, 16px);
+      position: relative;
+
   }
 
   .arch {
-    border-top: 1.5px solid rgba(178, 152, 126, 0.5);
-    border-radius: 999px 999px 28px 28px;
-    padding: clamp(14px, 3vh, 22px);
+    padding: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
+      height: 100%;
     min-height: clamp(220px, 50vh, 360px);
+
+  }
+  .artifact-frame::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      border-radius: 999px 999px 0 0;
+      border: 1.5px solid rgba(178, 152, 126, 0.5);
+      mask-image: linear-gradient(
+              to bottom,
+              black 0%,
+              black 50%,
+              transparent 90%,
+              transparent 100%
+      );
+  }
+  .artifact-frame::after {
+      content: "";
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      bottom: 0;
+      right: 15px;
+      border-radius: 999px 999px 0 0;
+      border: 1.5px solid rgba(178, 152, 126, 0.5);
+      mask-image: linear-gradient(
+              to bottom,
+              black 0%,
+              black 50%,
+              transparent 90%,
+              transparent 100%
+      );
   }
 
   .arch img {
-    max-width: 260px;
     width: 100%;
     height: 100%;
     max-height: 100%;
@@ -177,6 +219,13 @@
     width: 100%;
     margin-top: auto;
     max-width: 360px;
+  }
+
+  .memoir-letter, .sun-proof-whites-1 {
+      transform: rotate(-5deg);
+  }
+  .glass-sphere, .travel-sketch {
+      transform: rotate(5deg);
   }
 
   @media (min-width: 480px) {

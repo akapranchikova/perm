@@ -1,160 +1,191 @@
 <script>
-  import { router, routes } from '../router';
-  import ActivityShell from '../components/ActivityShell.svelte';
-  import FramesHolder from '../components/FramesHolder.svelte';
-  import BrightnessSlider from '../components/BrightnessSlider.svelte';
-  import { getArtifactForActivity } from '../data/artifacts';
-  import '../styles/fonts.css';
-  import '../styles/constants.css';
-  import '../styles/interactive-elements.css';
+  import { router, routes } from "../router";
+  import ActivityShell from "../components/ActivityShell.svelte";
+  import FramesHolder from "../components/FramesHolder.svelte";
+  import BrightnessSlider from "../components/BrightnessSlider.svelte";
+  import GestureResizeIndicator from "../components/GestureResizeIndicator.svelte";
+  import GuideCircleVideo from "../components/GuideCircleVideo.svelte";
+  import SoundButton from "../components/SoundButton.svelte";
+  import ActivityGuideIntro from "../components/ActivityGuideIntro.svelte";
+  import { getArtifactForActivity } from "../data/artifacts";
+  import "../styles/fonts.css";
+  import "../styles/constants.css";
+  import "../styles/interactive-elements.css";
+  import { settings } from "../stores/settings";
 
   // Константы конфигурации
   const MIN_VALUE = 0;
   const MAX_VALUE = 100;
   const MAX_SCALE = 10;
-  const TOTAL_FRAMES_COUNT = 9;
+  const TOTAL_FRAMES_COUNT = 10;
   const FRAME_NAME_DIGIT_COUNT = 4;
-  const FRAME_BASE_PATH = '/activityA/';
+  const FRAME_BASE_PATH = '/activityF/';
   const FRAME_NAME_BASE = 'frame_';
   const FRAME_NAME_EXTENSION = '.png';
 
+  const VIDEO_BASE_PATH = "/activityF/";
+  const CIRCLE_VIDEO_SRC = `${VIDEO_BASE_PATH}sick_2.webm`;
+  const CIRCLE_VIDEO_SUBS = `${VIDEO_BASE_PATH}sick_2.srt`;
+
   // $state
   let value = $state(MIN_VALUE);
-  let currentFrameIndex = $state(0);
-  let nextFrameIndex = $state(0);
   let isSliderCompleted = $state(false);
-
-  // $derived
-  let frameDisplayInfo = $derived({
-    current: Math.floor((value - MIN_VALUE) / (MAX_VALUE - MIN_VALUE) * (TOTAL_FRAMES_COUNT - 1)) + 1,
-    next: Math.floor((value - MIN_VALUE) / (MAX_VALUE - MIN_VALUE) * (TOTAL_FRAMES_COUNT - 1)) + 2
-  });
+  let bubbleText = $state("");
 
   function finish() {
-    const artifact = getArtifactForActivity(routes.ACTIVITY_A);
+    const artifact = getArtifactForActivity(routes.ACTIVITY_F);
     router.go(routes.ARTIFACT_REWARD, { artifactId: artifact?.id });
   }
 
   const intro = {
     title: "Больная",
     subtitle: "Василий Поленов",
-    description:
-      "Картина показывает больную...",
-    imageUrl: "/activityA/frame_0001.png",
+    description: "Своей картиной Поленов показывает хрупкость жизни: девушка слабеет и угасает, "
+      + "а свет в комнате словно подчеркивает тишину и близость конца",
+    imageUrl: `${FRAME_BASE_PATH}title-picture.png`,
     imageAlt: "Больная — Василий Поленов",
+    mapSvg: `${FRAME_BASE_PATH}floor-map.svg`,
     floorLabel: "2 этаж",
     buttonText: "Начать",
+  };
+
+  const finalVideo ={
+    src: `${VIDEO_BASE_PATH}sick_3.mp4`,
+    subtitles: `${VIDEO_BASE_PATH}sick_3.srt`,
+    aspectRatio: "9 / 16",
+    autoplay: true,
+    loop: false,
+    controls: false,
+    subtitlesLabel: "Субтитры",
+    subtitlesLang: "ru",
   };
 
   function handleValueChanged(newValue) {
     value = newValue;
   }
 
+  function handleVideoSoundTap() {
+    settings.update((s) => ({ ...s, audioEnabled: !s.audioEnabled }));
+  }
+
+  function handleSubtitleChange(event) {
+    console.log('UPD')
+    bubbleText = event?.detail?.text?.trim() ?? "";
+  }
+
   function handlePrimaryAction() {
     if (!isSliderCompleted) {
       isSliderCompleted = true;
-      return;
     }
-
-    finish();
   }
+
+  const guide = {
+    buttonText: "Продолжить",
+    video: {
+      src: `${VIDEO_BASE_PATH}sick_1.webm`,
+      subtitles: `${VIDEO_BASE_PATH}sick_1.srt`,
+      //poster: "/images/gigachat.png",
+      aspectRatio: "9 / 16",
+      autoplay: true,
+      loop: false,
+      controls: false,
+      subtitlesLabel: "Субтитры",
+      subtitlesLang: "ru",
+    },
+  };
 </script>
 
-<ActivityShell {intro}>
-  <div
-    class="safe activity media-screen"
-    style="--screen-bg: url('/images/background1.png'); --overlay-text: var(--txt-white);"
-  >
-    <div class="topbar">
-      <div class="logo-group" aria-label="Поленов и Сбер">
-        <span class="logo logo-white" aria-hidden="true"></span>
+<ActivityShell {intro} {guide}>
+  {#if !isSliderCompleted}
+    <div
+      class="safe activity media-screen"
+      style="--screen-bg: url('/onboarding/background1.jpg'); --overlay-text: var(--txt-white);"
+    >
+      <div class="bottom-gradient"></div>
+      <div class="topbar">
+        <div class="logo-group" aria-label="Поленов и Сбер">
+          <span class="logo logo-white" aria-hidden="true"></span>
+        </div>
+        <SoundButton isMuted={!$settings.audioEnabled} onTap={handleVideoSoundTap} />
       </div>
 
-      <button class="sound-btn" type="button" aria-label="Звук">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M11 5L6.5 9H3v6h3.5L11 19V5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          <path d="M16 9c1.5 1.5 1.5 4.5 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          <path d="M18.5 6.5c3 3 3 8 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="quote">
-      <img class="avatar" src="/guide.png" alt="" />
-      <div class="bubble">
-        <div class="bubbleText">
-          которые когда-то закладывал Василий Дмитриевич Поленов
+      <div class="quote">
+          <GuideCircleVideo
+            src={CIRCLE_VIDEO_SRC}
+            subtitlesSrc={CIRCLE_VIDEO_SUBS}
+            isMuted={!$settings.audioEnabled}
+            autoplay={true}
+            isLooped={false}
+            on:subtitlechange={handleSubtitleChange}
+            cssClass="guide-circle-video"
+          />
+        <div class="bubble">
+          <div class="bubbleText">
+            {bubbleText ||
+              ""}
+          </div>
         </div>
       </div>
-    </div>
 
       <div class="body">
-          <div class="paintingCard">
-              <FramesHolder
-                      alt='Картина Василия Поленова - Больная'
-                      minValue={MIN_VALUE}
-                      maxValue={MAX_VALUE}
-                      maxScale={MAX_SCALE}
-                      totalFramesCount={TOTAL_FRAMES_COUNT}
-                      frameNameDigitCount={FRAME_NAME_DIGIT_COUNT}
-                      frameBasePath={FRAME_BASE_PATH}
-                      frameNameBase={FRAME_NAME_BASE}
-                      frameNameExtension={FRAME_NAME_EXTENSION}
-                      {value}
-                      cssClass="painting"
-              />
-          </div>
-
-          <div class="gesture" aria-hidden="true">
-              <svg width="44" height="47" viewBox="0 0 44 47" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <g clip-path="url(#clip0_898_8675)">
-                      <path d="M24.4978 46.7116C24.4134 46.6281 24.3442 46.338 24.3442 46.0662C24.3442 45.796 24.1706 45.0668 23.9586 44.4485C23.6506 43.5508 23.0984 42.861 21.2235 41.0331C18.8904 38.7585 18.8611 38.7164 16.9871 34.921C14.9194 30.7331 13.8682 29.0029 12.1346 26.9334C10.9148 25.4774 10.5492 24.5976 10.919 24.0087C11.5341 23.0295 13.4452 22.7871 14.8543 23.51C16.016 24.1056 17.2543 25.4225 18.669 27.5672C19.8979 29.4297 20.5187 29.8338 21.0476 29.1153C21.4611 28.5535 21.4533 21.6924 21.0396 20.5551C20.8788 20.1148 19.9144 18.6735 18.8969 17.3522C16.4911 14.2288 16.423 14.0945 16.7492 13.1126C17.1008 12.054 17.9811 11.4043 19.0638 11.4043C19.8993 11.4043 20.0502 11.5354 22.5446 14.4299C23.9787 16.0941 25.3334 17.6642 25.5551 17.9189C25.9243 18.3429 25.9776 18.3496 26.1897 17.9984C26.5133 17.4639 27.6491 17.2664 28.6019 17.5787C29.7807 17.9642 30.3334 18.7867 30.3334 20.1529V20.5943C30.3334 20.8276 30.6262 20.9318 30.7736 20.751C31.1336 20.3095 31.4311 20.2109 32.4045 20.2109C33.4583 20.2109 33.6724 20.2984 34.2671 20.958C34.7371 21.4806 34.9391 21.9447 34.9391 22.5022V22.6503C34.9391 22.8905 35.2292 23.0113 35.3997 22.842C36.3343 21.9133 38.4091 22.5042 38.9802 23.8624C39.2266 24.4486 40.2656 35.1559 39.39 37.7637C39.0366 38.8164 38.0837 40.5395 38.0837 40.5395C36.8691 42.9854 36.3203 44.7434 36.3203 46.1878C36.3203 46.5607 36.018 46.863 35.6451 46.863H30.4864C27.2778 46.863 24.5823 46.795 24.4978 46.7116Z" fill="#B2987E" fill-opacity="0.7"/>
-                      <path d="M30.4003 0.196293C30.399 0.355253 30.1435 1.83884 29.8324 3.4893L29.4649 5.43963C29.3718 5.93407 28.8006 6.16907 28.3866 5.88326C27.9025 5.55037 27.4756 5.31576 27.4381 5.36459C27.4009 5.41543 26.5908 6.49179 25.6387 7.76011C24.6867 9.02843 23.8388 10.1067 23.7544 10.1557C23.6701 10.2055 23.3 9.99439 22.932 9.68995C22.559 9.3805 22.4993 8.83077 22.797 8.4482L23.0142 8.16907C23.4275 7.63783 24.2712 6.51691 24.8891 5.67788L25.418 4.95974C25.7538 4.50391 25.6832 3.86675 25.2559 3.49566C24.8949 3.18223 24.9674 2.60276 25.3944 2.38761L26.6941 1.73272C30.3222 -0.0956307 30.403 -0.128784 30.4003 0.196293Z" fill="#B2987E" fill-opacity="0.7"/>
-                      <path d="M1.59033 39.2555C1.58829 39.0966 1.81202 37.6079 2.0878 35.9513L2.41347 33.9937C2.49603 33.4974 3.06209 33.2504 3.48207 33.5274C3.97322 33.85 4.40496 34.0755 4.44147 34.0259C4.47755 33.9743 5.26448 32.8811 6.18923 31.593C7.11398 30.3049 7.93867 29.209 8.02191 29.1582C8.10519 29.1067 8.47968 29.3099 8.85415 29.6065C9.23362 29.9081 9.30511 30.4564 9.01565 30.8452L8.80445 31.1288C8.4026 31.6686 7.58303 32.8071 6.98323 33.659L6.46973 34.3881C6.14379 34.8509 6.22795 35.4864 6.66312 35.8484C7.03066 36.1542 6.97061 36.735 6.5483 36.9592L5.26285 37.6413C1.67465 39.5457 1.59455 39.5806 1.59033 39.2555Z" fill="#B2987E" fill-opacity="0.7"/>
-                  </g>
-                  <defs>
-                      <clipPath id="clip0_898_8675">
-                          <rect width="44" height="47" fill="white"/>
-                      </clipPath>
-                  </defs>
-              </svg>
-          </div>
+        <div class="painting-wrapper">
+          <FramesHolder
+            alt='Картина Василия Поленова - Больная'
+            minValue={MIN_VALUE}
+            maxValue={MAX_VALUE}
+            maxScale={MAX_SCALE}
+            totalFramesCount={TOTAL_FRAMES_COUNT}
+            frameNameDigitCount={FRAME_NAME_DIGIT_COUNT}
+            frameBasePath={FRAME_BASE_PATH}
+            frameNameBase={FRAME_NAME_BASE}
+            frameNameExtension={FRAME_NAME_EXTENSION}
+            {value}
+            cssClass="painting"
+            paintingStartMinPadding={32}
+          />
+        </div>
+        <div class="painting-caption">
+          В. Д.Поленов · 1880-е · Государственный музей-заповедник В. Д. Поленова
+        </div>
+        <div class="paintingCard">
+        </div>
+        <div
+          class="gesture"
+          aria-hidden="true"
+        >
+          <GestureResizeIndicator />
+        </div>
       </div>
 
+      <div class="sliderBlock">
+        <BrightnessSlider
+          value={value}
+          minValue={MIN_VALUE}
+          maxValue={MAX_VALUE}
+          onValueChanged={handleValueChanged}
+        />
+      </div>
 
-      {#if !isSliderCompleted}
-          <div class="sliderBlock">
-              <div class="label">Освещённость</div>
+      <button class="cta-button primary " type="button" onclick={handlePrimaryAction}>
+        Далее
+      </button>
+    </div>
+  {/if}
 
-              <BrightnessSlider
-                      value={value}
-                      minValue={MIN_VALUE}
-                      maxValue={MAX_VALUE}
-                      onValueChanged={handleValueChanged}
-                      cssClass="my-custom-slider"
-              />
-
-              <div class="small">
-                  Кадр: {frameDisplayInfo.current}
-                  {#if frameDisplayInfo.current < TOTAL_FRAMES_COUNT}
-                      → {frameDisplayInfo.next}
-                  {/if}
-              </div>
-          </div>
-      {/if}
-
-    <button class="cta-button primary " type="button" onclick={handlePrimaryAction}>
-      {isSliderCompleted ? 'Завершить' : 'Далее'}
-    </button>
-  </div>
-    <div class="bottom-gradient"></div>
-
+  {#if isSliderCompleted}
+    <ActivityGuideIntro
+      video={finalVideo}
+      buttonText="Завершить"
+      onNext={finish}
+    />
+  {/if}
 </ActivityShell>
 
 <style>
   .activity {
     position: relative;
     gap: 16px;
+    overscroll-behavior: none;
     display: flex;
     flex-direction: column;
     height: 100dvh;
@@ -188,27 +219,56 @@
   }
 
   .body {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+    flex: 1;
+    align-items: flex-end;
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    position: relative;
+  }
+
+  .painting-caption {
+    font-family: Inter;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 130%;
+    letter-spacing: 0%;
+    text-align: center;
+    vertical-align: middle;
+    color: var(--txt-white);
+    top: -5px;
+    position: absolute;
   }
 
   .paintingCard {
     padding: 0;
-      height: 220px;
+    height: 220px;
     overflow: hidden;
   }
 
-  :global(.painting) {
-    overflow: hidden;
-    aspect-ratio: 16 / 10;
+  .painting-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-left: -18px;
+    margin-right: -18px;
+    box-sizing: border-box;
+    z-index: 10;
   }
 
   .gesture {
     display: grid;
     place-items: center;
-    margin-top: -4px;
+    color: var(--accent);
+    margin-top: auto;
+  }
+
+  :global(.painting) {
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
   }
 
   .gesture svg {
@@ -237,43 +297,4 @@
     color: rgba(255, 252, 248, 0.65);
     font-weight: 500;
   }
-
-  :global(.my-custom-slider) {
-  }
-
-  /*
-  TODO: это стили для слайдера с ползунком, пока закомментированы, потому что здесь здругой слайдер
-  :global(.my-custom-slider.slider-container) {
-    width: 100%;
-  }
-
-  :global(.my-custom-slider .slider-track) {
-    height: 9px;
-    background: rgba(255, 252, 248, 0.25);
-    border: 1px solid rgba(255, 252, 248, 0.32);
-    border-radius: 999px;
-  }
-
-  :global(.my-custom-slider .slider-progress) {
-    background: linear-gradient(90deg, rgba(178, 152, 126, 0.8), rgba(178, 152, 126, 1));
-    border-radius: 999px;
-  }
-
-  :global(.my-custom-slider .slider-thumb) {
-    width: 30px;
-    height: 30px;
-    background: rgba(254, 252, 248, 0.96);
-    border: 2px solid rgba(178, 152, 126, 0.98);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
-  }
-
-  :global(.my-custom-slider .thumb-value) {
-    display: none;
-  }
-
-  :global(.my-custom-slider .slider-input) {
-    height: 40px;
-  }
-  */
-
 </style>

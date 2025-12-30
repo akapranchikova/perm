@@ -1,20 +1,34 @@
 <script>
-  import './styles/app.css';
+  import "./styles/app.css";
+  
+  import { onMount } from "svelte";
+  import { artifactsCatalog } from "./data/artifacts";
 
-  import { router, routes } from './router';
+  import { router, routes } from "./router";
 
-  import Playtests from './screens/Playtests.svelte';
-  import StartLoading from './screens/StartLoading.svelte';
-  import Onboarding from './screens/Onboarding.svelte'
+  import Playtests from "./screens/Playtests.svelte";
+  import StartLoading from "./screens/StartLoading.svelte";
+  import Onboarding from "./screens/Onboarding.svelte";
 
-  import ActivityA from './activities/ActivityA.svelte';
-  import ActivityF from './activities/ActivityF.svelte';
-  import ActivityB from './activities/ActivityB.svelte';
-  import ActivityC from './activities/ActivityC.svelte';
-  import ActivityD from './activities/ActivityD.svelte';
-  import ActivityE from './activities/ActivityE.svelte';
-  import ArtifactReward from './screens/ArtifactReward.svelte';
-  import ArtifactJournal from './screens/ArtifactJournal.svelte';
+  import ActivityA from "./activities/ActivityA.svelte";
+  import ActivityF from "./activities/ActivityF.svelte";
+  import ActivityB from "./activities/ActivityB.svelte";
+  import ActivityC from "./activities/ActivityC.svelte";
+  import ActivityD from "./activities/ActivityD.svelte";
+  import ActivityE from "./activities/ActivityE.svelte";
+  import ArtifactReward from "./screens/ArtifactReward.svelte";
+  import ArtifactJournal from "./screens/ArtifactJournal.svelte";
+
+  function preloadImages() {
+    artifactsCatalog.forEach((artifact) => {
+      const img = new Image();
+      img.src = artifact.image;
+    });
+  }
+
+//onMount(() => {
+    preloadImages();
+//});
 
 </script>
 

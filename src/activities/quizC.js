@@ -1,52 +1,16 @@
 export const quizC = {
   title: "История Анны",
   avatarUrl: "/avatar.png",
-  stories: [
-    {
-      id: "intro",
-      lines: [
-        "Анна родилась в Нанте,",
-        "в герцогстве Бретань —",
-        "последнем уголке",
-        "самостоятельной Франции.",
-      ],
-      videoUrl: "/painting.png",
-      videoAlt: "Акварель с видом старого замка",
-    },
-    {
-      id: "after-q1",
-      lines: [
-        "Это был бы серьезный жест,",
-        "но всё было не так. Анна",
-        "очень тонко намекнула мужу,",
-      ],
-      videoUrl: "/painting.png",
-      videoAlt: "Акварель с видом замка после первого вопроса",
-    },
-    {
-      id: "after-q2",
-      lines: [
-        "Он понял намёк и согласился",
-        "сохранить самобытность Бретани,",
-        "заключив союз, который изменил",
-        "историю Франции.",
-      ],
-      videoUrl: "/painting.png",
-      videoAlt: "Акварель с видом замка после второго вопроса",
-    },
-    {
-      id: "after-q3",
-      lines: [
-        "Ноты из рукописи зазвучали",
-        "снова — как и голос Анны,",
-        "которую Поленов",
-        "не забывал всю жизнь.",
-      ],
-      videoUrl: "/painting.png",
-      videoAlt: "Акварель с видом замка перед гидом",
-    },
-  ],
-  questions: [
+  // Вступление (опционально, можно показать перед первым вопросом)
+  intro: {
+    id: "intro",
+    videoUrl: "/activityC/stage_1.webm",
+    videoAlt: "Рождение",
+    guideVideoSrc: "/activityC/guide_stage_1.webm",
+    guideSubtitlesSrc: "/activityC/guide_stage_1.srt",
+  },
+  // Основной цикл: Вопрос -> Реакция
+  rounds: [
     {
       id: "q1",
       prompt: "Как Анна выразила протест против брака?",
@@ -56,6 +20,17 @@ export const quizC = {
         "Не пришла на торжество",
       ],
       correctIndex: 1,
+      // Что показываем после ответа
+      feedbackCorrect: {
+        guideVideoSrc: "/activityC/guide_stage_2.webm",
+        guideSubtitlesSrc: "/activityC/guide_stage_2.srt",
+        mainVideoUrl: "/activityC/stage_2.webm", // Фоновое видео
+      },
+      feedbackIncorrect: {
+        guideVideoSrc: "/activityC/guide_hint_stage_1.webm",
+        guideSubtitlesSrc: "/activityC/guide_hint_stage_1.srt",
+        mainVideoUrl: "/activityC/stage_2.webm",
+      },
     },
     {
       id: "q2",
@@ -66,30 +41,50 @@ export const quizC = {
         "Задохнулся от сильного смеха",
       ],
       correctIndex: 0,
+      feedbackCorrect: {
+        guideVideoSrc: "/activityC/guide_stage_3.webm",
+        guideSubtitlesSrc: "/activityC/guide_stage_3.srt",
+        mainVideoUrl: "/activityC/stage_3.webm",
+      },
+      feedbackIncorrect: {
+        guideVideoSrc: "/activityC/guide_hint_stage_2.webm",
+        guideSubtitlesSrc: "/activityC/guide_hint_stage_2.srt",
+        mainVideoUrl: "/activityC/stage_3.webm",
+      },
     },
     {
       id: "q3",
-      prompt: "Почему история Анны вдохновила Поленова?",
+      prompt: "Какой экспонат хранится в память об Анне Бретонской?",
       answers: [
-        "Это история о свободе выбора",
-        "В ней много военных побед",
-        "Она посвящена морским путешествиям",
+        "Её дневники",
+        "Золотой ковчег с сердцем Анны",
+        "Перчатки",
       ],
       correctIndex: 0,
-    },
+      feedbackCorrect: {
+        guideVideoSrc: "/activityC/guide_stage_4.webm",
+        guideSubtitlesSrc: "/activityC/guide_stage_4.srt",
+        mainVideoUrl: "/activityC/stage_4.webm",
+      },
+      feedbackIncorrect: {
+        guideVideoSrc: "/activityC/guide_hint_stage_3.webm", // НОВЫЙ URL
+        guideSubtitlesSrc: "/activityC/guide_hint_stage_3.srt",
+        mainVideoUrl: "/activityC/stage_4.webm",
+      },
+    }
   ],
   finalGuide: {
     buttonText: "Завершить",
-    audio: {
-      src: "/audio/onboarding-welcome.wav",
-      captions: [
-        {
-          t: 0,
-          text:
-            "Вот это история! Не удивительно, что она вдохновила Поленова на музыку",
-        },
-      ],
+    video: {
+      src: "/activityC/guide_out.webm",
+      subtitles: "/activityС/guide_out.srt",
+      poster: "/images/gigachat.png",
+      aspectRatio: "9 / 16",
       autoplay: true,
+      loop: false,
+      controls: false,
+      subtitlesLabel: "Субтитры",
+      subtitlesLang: "ru",
     },
   },
 };

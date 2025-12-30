@@ -1,37 +1,27 @@
 export const memories = [
   {
+    id: 'korovin',
+    name: 'Константин Коровин',
+    role: 'Источник воспоминания',
+    portraitUrl: '/activityB/Korovin.png',
+    videoUrl: '/activityB/korovin.webm',
+    videoUrlMov: '/activityB/korovin.mov',
+    srtUrl: '/activityB/korovin.srt'
+  },
+  {
     id: 'tatevosyan',
     name: 'Егише Татевосян',
-    role: 'Источник воспоминания',
     portraitUrl: '/activityB/Egishe.png',
-    audioUrl: '/activityB/memo1.mp3',
-    excerpt:
-      'Какой скромной души был этот прекрасный художник! Как он любил нас, Левитана, меня…',
-    fullText: `С большим чувством признательности я вспоминаю своих учителей живописи...`,
-    captions: [
-      { t: 0.0, text: 'С большим чувством признательности…' },
-      { t: 4.2, text: '…вспоминаю своих учителей живописи.' },
-      { t: 8.5, text: 'Милого друга, Василия Дмитриевича Поленова…' }
-    ]
+    videoUrl: '/activityB/egishe.webm',
+    videoUrlMov: '/activityB/egishe.mov',
+    srtUrl: '/activityB/egishe.srt'
   },
   {
-    id: 'memo2',
-    name: 'Ученик №2',
-    role: 'Источник воспоминания',
-    portraitUrl: '/Korovin.png',
-    audioUrl: '/memo2.mp3',
-    excerpt: 'Короткая выдержка воспоминания №2…',
-    fullText: `Полный текст воспоминания №2...`,
-    captions: [{ t: 0, text: 'Титры для №2…' }]
-  },
-  {
-    id: 'memo3',
-    name: 'Ученик №3',
-    role: 'Источник воспоминания',
-    portraitUrl: '/student.png',
-    audioUrl: '/memo3.mp3',
-    excerpt: 'Короткая выдержка воспоминания №3…',
-    fullText: `Полный текст воспоминания №3...`,
-    captions: [{ t: 0, text: 'Титры для №3…' }]
+    id: 'pasternak',
+    name: 'Леонид Пастернак',
+    portraitUrl: '/activityB/Pasternak.png',
+    videoUrl: '/activityB/pasternak.webm',
+    videoUrlMov: '/activityB/pasternak.mov',
+    srtUrl: '/activityB/pasternak.srt'
   }
 ];

@@ -15,8 +15,10 @@
         frameNameBase = "frame_",
         frameNameExtension = ".png",
         cssClass = "",
+        paintingStartMinPadding = 0,
         alt = "",
-        value = 0
+        value = 0,
+        onFirstTap = () => {}
     } = $props();
 
     let scale = $state(1);
@@ -43,6 +45,8 @@
     let isTouchDragging = $state(false);
 
     let isMouseDragging = $state(false);
+
+    let firstTapWasOccurred = $state(false);
 
     let normalizedValue = $derived((value - minValue) / (maxValue - minValue));
     let frameFloatIndex = $derived(normalizedValue * (totalFramesCount - 1));
@@ -77,8 +81,10 @@
         }
 
         const rect = containerElement.getBoundingClientRect();
-        const availableWidth = rect.width || containerElement.clientWidth;
-        const availableHeight = rect.height || containerElement.clientHeight;
+        const availableWidth = (rect.width || containerElement.clientWidth)
+            - paintingStartMinPadding * 2;
+        const availableHeight = (rect.height || containerElement.clientHeight)
+            - paintingStartMinPadding * 2;
 
         if (availableWidth <= 0 || availableHeight <= 0) {
             return 1;
@@ -114,7 +120,8 @@
             newMaxTranslateY;
 
         if (scaledWidth <= containerWidth) {
-            newMaxTranslateX = (containerWidth - scaledWidth) / 2;
+            newMaxTranslateX = paintingStartMinPadding
+                + (containerWidth - scaledWidth - paintingStartMinPadding * 2) / 2;
             newMinTranslateX = newMaxTranslateX;
         } else {
             newMaxTranslateX = 0;
@@ -122,7 +129,8 @@
         }
 
         if (scaledHeight <= containerHeight) {
-            newMaxTranslateY = (containerHeight - scaledHeight) / 2;
+            newMaxTranslateY = paintingStartMinPadding
+                + (containerHeight - scaledHeight - paintingStartMinPadding * 2) / 2;
             newMinTranslateY = newMaxTranslateY;
         } else {
             newMaxTranslateY = 0;
@@ -194,8 +202,10 @@
             const scaledWidth = imageNaturalSize.width * scale;
             const scaledHeight = imageNaturalSize.height * scale;
 
-            translateX = (containerWidth - scaledWidth) / 2;
-            translateY = (containerHeight - scaledHeight) / 2;
+            translateX = paintingStartMinPadding
+                + (containerWidth - scaledWidth - paintingStartMinPadding * 2) / 2;
+            translateY = paintingStartMinPadding
+                + (containerHeight - scaledHeight - paintingStartMinPadding * 2) / 2;
 
             isReady = true;
 
@@ -258,6 +268,15 @@
         }
     }
 
+    function checkFirstTap() {
+        if (!firstTapWasOccurred) {
+            firstTapWasOccurred = true;
+            if (onFirstTap) {
+                onFirstTap();
+            }
+        }
+    }
+
     function handleMouseDown(event) {
         if (event.button !== 0) {
             return;
@@ -271,6 +290,8 @@
             lastMouseX = event.clientX;
             lastMouseY = event.clientY;
         }
+
+        checkFirstTap();
     }
 
     function handleMouseMove(event) {
@@ -333,6 +354,8 @@
 
                 updateBoundaries();
             }
+
+            checkFirstTap();
         } catch (error) {
             console.error("Ошибка в handleWheel:", error);
         }
@@ -367,6 +390,8 @@
             lastMouseX = touch.clientX;
             lastMouseY = touch.clientY;
         }
+
+        checkFirstTap();
     }
 
     function handleTouchMove(event) {
@@ -533,7 +558,6 @@
     role="button"
     tabindex="0"
     aria-label="Картина"
-    {alt}
 >
     {#if loadingStage === "loading"}
         <div class="loading-indicator">Загрузка...</div>
@@ -554,6 +578,7 @@
                     class="frame bottom"
                     src={displayBottomSrc}
                     alt="Изображение кадра"
+                    loading="eager"
                 />
 
                 {#if displayTopSrc && displayTopSrc !== displayBottomSrc}
@@ -561,6 +586,7 @@
                         class="frame top"
                         src={displayTopSrc}
                         alt=""
+                        loading="eager"
                         style="opacity: {displayOpacity};"
                         aria-hidden="true"
                     />

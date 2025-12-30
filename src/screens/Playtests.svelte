@@ -1,44 +1,190 @@
 <script>
-  import { router, routes } from '../router';
-  import { settings } from '../stores/settings';
+  import { router, routes } from "../router";
+
+  import { assetsStore } from "../stores/assets";
+  $: getSrc = (src) => $assetsStore.get(src) || src;
+
+  import { settings } from "../stores/settings";
+  import { collectedArtifacts } from "../stores/artifacts";
+  import PaintingVisitorMap from "../components/PaintingVisitorMap.svelte";
+  import { onMount } from "svelte";
 
   const hero = {
-    lead: '/guide.png',
-    badge: '/book.png',
-    text: 'Изучайте экспонаты, отмеченные на карте, и наполняйте путевой дневник артефактами'
+    lead: "/guide.png",
+    badge: "/book.png",
+    text: "Изучайте экспонаты, отмеченные на карте, и наполняйте путевой дневник артефактами",
   };
 
   const items = [
-    { id: routes.ACTIVITY_A, title: 'Пастух со стадом', desc: 'Егише Татевосян', image: '/activityA/frame_0003.png', floor: 2 },
-    { id: routes.ACTIVITY_F, title: 'Больная', desc: 'Василий Поленов', image: '/activityA/frame_0001.png', floor: 2 },
-    { id: routes.ACTIVITY_B, title: 'Приветственный адрес Поленову от учеников', desc: null, image: '/activityB/background.png', floor: 1 },
-    { id: routes.ACTIVITY_C, title: 'Музыкальная рукопись «Анна Бретонская»', desc: 'Василий Поленов', image: '/painting.png', floor: 1 },
-    { id: routes.ACTIVITY_D, title: 'Настурции', desc: 'Константин Коровин', image: '/painting-d.png', floor: 2 },
-    { id: routes.ACTIVITY_E, title: 'Альбом с фотографиями из восточной поездки', desc: 'Леонид Кандауров', image: '/guides.png', floor: 2 }
+    {
+      id: routes.ACTIVITY_B,
+      title: "Приветственный адрес Поленову от учеников",
+      desc: "Василий Поленов",
+      image: "/activityList/01.png",
+      floor: 1,
+    },
+    {
+      id: routes.ACTIVITY_A,
+      title: "Пастух со стадом",
+      desc: "Егише Татевосян",
+      image: "/activityList/03.png",
+      floor: 2,
+    },
+    {
+      id: routes.ACTIVITY_E,
+      title: "Альбом с фотографиями из восточной поездки",
+      desc: "Леонид Кандауров",
+      image: "/activityList/04.png",
+      floor: 2,
+    },
+    {
+      id: routes.ACTIVITY_F,
+      title: "Больная",
+      desc: "Василий Поленов",
+      image: "/activityList/05.png",
+      floor: 2,
+    },
+    {
+      id: routes.ACTIVITY_D,
+      title: "Настурции",
+      desc: "Константин Коровин",
+      image: "/activityList/06.png",
+      floor: 2,
+    },
   ];
 
-  const floors = [
-    { label: '1 этаж', value: 1 },
-    { label: '2 этаж', value: 2 }
-  ];
+  let floors = [];
+
+  function updateFloors() {
+    function paintingIsVisited(activityId) {
+      return (
+        Array.isArray($collectedArtifacts) &&
+        $collectedArtifacts.some(
+          (artifact) => artifact.activityRoute === activityId
+        )
+      );
+    }
+
+    floors = [
+      {
+        label: "1 этаж",
+        value: 1,
+        markedMapSrc: "/images/floor-1-marked.svg",
+        pointsInfo: [
+          {
+            id: "activityC",
+            poit: null,
+            title: "Музыкальная рукопись «Анна Бретонская»",
+            titlePosition: "bottom",
+            shouldShowTitle: false,
+            isOnMap: false,
+            isOpened: paintingIsVisited(routes.ACTIVITY_C),
+            shouldDisplay: false,
+            onTap: () => router.go(routes.ACTIVITY_C),
+          },
+          {
+            id: "activityB",
+            poit: null,
+            title: "Приветственный адрес Поленову от учеников",
+            titlePosition: "right",
+            shouldShowTitle: false,
+            isOnMap: false,
+            isOpened: paintingIsVisited(routes.ACTIVITY_B),
+            shouldDisplay: true,
+            onTap: () => router.go(routes.ACTIVITY_B),
+          },
+        ],
+      },
+      {
+        label: "2 этаж",
+        value: 2,
+        markedMapSrc: "/images/floor-2-marked.svg",
+        pointsInfo: [
+          {
+            id: "activityF",
+            poit: null,
+            title: "Больная — Василий Поленов",
+            titlePosition: "right",
+            shouldShowTitle: false,
+            isOnMap: false,
+            isOpened: paintingIsVisited(routes.ACTIVITY_F),
+            shouldDisplay: true,
+            onTap: () => router.go(routes.ACTIVITY_F),
+          },
+          {
+            id: "activityD",
+            poit: null,
+            title: "Настурции — Константин Коровин",
+            titlePosition: "top",
+            shouldShowTitle: false,
+            isOnMap: false,
+            isOpened: paintingIsVisited(routes.ACTIVITY_D),
+            shouldDisplay: true,
+            onTap: () => router.go(routes.ACTIVITY_D),
+          },
+          {
+            id: "activityA",
+            poit: null,
+            title: "Пастух со стадом — Егише Татевосян",
+            titlePosition: "bottom",
+            shouldShowTitle: false,
+            isOnMap: false,
+            isOpened: paintingIsVisited(routes.ACTIVITY_A),
+            shouldDisplay: true,
+            onTap: () => router.go(routes.ACTIVITY_A),
+          },
+          {
+            id: "activityE",
+            poit: null,
+            title: "Альбом с фотографиями из восточной поездки",
+            titlePosition: "left",
+            shouldShowTitle: false,
+            isOnMap: false,
+            isOpened: paintingIsVisited(routes.ACTIVITY_E),
+            shouldDisplay: true,
+            onTap: () => router.go(routes.ACTIVITY_E),
+          },
+        ],
+      },
+    ];
+  }
+
+  onMount(() => {
+    updateFloors();
+  });
+
+  $: {
+    updateFloors();
+  }
 
   const floorMaps = {
-    1: '/images/floor-1.svg',
-    2: '/images/floor-2.svg'
+    1: "/images/floor-1.svg",
+    2: "/images/floor-2.svg",
   };
 
-  let viewMode = 'list';
+  let viewMode = "list";
+
+  $: isCompleted = (activityId) => {
+    return $collectedArtifacts.some(
+      (artifact) => artifact.activityRoute === activityId
+    );
+  };
 </script>
 
 <div class="playtests">
   <header class="hero">
     <div class="hero-grid">
       <div class="circle">
-        <img src={hero.lead} alt="Гид" loading="lazy" />
+        <img src={hero.lead} alt="Гид" />
       </div>
       <p class="hero-text">{hero.text}</p>
-      <button class="circle action" type="button" on:click={() => router.go(routes.ARTIFACT_JOURNAL)} aria-label="Открыть путевой дневник">
-        <img src={hero.badge} alt="Дневник" loading="lazy" />
+      <button
+        class="circle action"
+        type="button"
+        on:click={() => router.go(routes.ARTIFACT_JOURNAL)}
+        aria-label="Открыть путевой дневник"
+      >
+        <img src={hero.badge} alt="Дневник" />
       </button>
     </div>
   </header>
@@ -46,24 +192,24 @@
   <section class="content">
     <div class="switcher" role="tablist" aria-label="Режим отображения">
       <button
-        class:active={viewMode === 'list'}
-        on:click={() => (viewMode = 'list')}
+        class:active={viewMode === "list"}
+        on:click={() => (viewMode = "list")}
         role="tab"
-        aria-selected={viewMode === 'list'}
+        aria-selected={viewMode === "list"}
       >
         Список
       </button>
       <button
-        class:active={viewMode === 'map'}
-        on:click={() => (viewMode = 'map')}
+        class:active={viewMode === "map"}
+        on:click={() => (viewMode = "map")}
         role="tab"
-        aria-selected={viewMode === 'map'}
+        aria-selected={viewMode === "map"}
       >
         Карта
       </button>
     </div>
 
-    {#if viewMode === 'list'}
+    {#if viewMode === "list"}
       <div class="floors">
         {#each floors as floor}
           <div class="floor">
@@ -72,7 +218,29 @@
               {#each items.filter((it) => it.floor === floor.value) as it}
                 <button class="activity" on:click={() => router.go(it.id)}>
                   <div class="activity-image">
-                    <img src={it.image} alt={it.title} loading="lazy" />
+                    <img src={getSrc(it.image)} alt={it.title} />
+
+                    <!-- 3. Условный рендеринг оверлея -->
+                    {#if isCompleted(it.id)}
+                      <div class="completed-overlay">
+                        <!-- Здесь SVG галочки. Можно заменить на <img src="..."> если есть файл -->
+                        <svg
+                          width="40"
+                          height="40"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M20 6L9 17L4 12"
+                            stroke="white"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </div>
+                    {/if}
                   </div>
                   <div class="activity-copy">
                     <p class="activity-title">{it.title}</p>
@@ -92,7 +260,13 @@
           <div class="floor map-floor">
             <p class="floor-label">{floor.label}</p>
             <div class="map-image">
-              <img src={floorMaps[floor.value]} alt={`Карта ${floor.label}`} loading="lazy" />
+              <PaintingVisitorMap
+                src={floor.markedMapSrc}
+                pointColor="#00FF00"
+                pointsInfo={floor.pointsInfo}
+                alt="Карта этажа"
+                cssClass=""
+              />
             </div>
           </div>
         {/each}
@@ -107,6 +281,11 @@
     flex-direction: column;
     height: 100dvh;
     background: rgba(178, 152, 126, 1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
   }
 
   .hero {
@@ -123,13 +302,12 @@
   }
 
   .circle {
-    width: clamp(52px, 14vw, 64px);
-    height: clamp(52px, 14vw, 64px);
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
     overflow: hidden;
-      padding: 0;
-      background: rgba(243, 237, 227, 1);
-      border: 1px solid rgba(255, 252, 248, 1);
+    padding: 0;
+    border: 1px solid rgba(255, 252, 248, 1);
     display: grid;
     place-items: center;
   }
@@ -137,12 +315,11 @@
   .circle.action {
     border: 1px solid rgba(254, 254, 252, 0.4);
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transform: rotate(24deg);
   }
 
   .circle.action:active {
     transform: translateY(1px) scale(0.98);
-    box-shadow: 0 10px 18px rgba(24, 22, 15, 0.16);
   }
 
   .circle img {
@@ -153,9 +330,9 @@
 
   .hero-text {
     margin: 0;
-    font-size: clamp(14px, 3.6vw, 16px);
-    line-height: 1.4;
-    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 500;
   }
 
   .content {
@@ -164,10 +341,9 @@
     border-radius: 28px 28px 0 0;
     padding: clamp(16px, 4vw, 20px);
     display: flex;
-      overflow-y: auto;
+    overflow-y: auto;
     flex-direction: column;
-    gap: clamp(18px, 4vw, 24px);
-    box-shadow: 0 -8px 24px rgba(24, 22, 15, 0.08);
+    gap: 28px;
   }
 
   .switcher {
@@ -176,7 +352,7 @@
     align-items: center;
     background: rgba(243, 237, 227, 1);
     border-radius: 51px;
-    padding: 4px;
+    padding: 5px 4px 4px;
     height: 51px;
     gap: 4px;
   }
@@ -190,7 +366,10 @@
     font-weight: 400;
     color: rgba(24, 22, 15, 0.5);
     cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease,
+      transform 0.2s ease;
   }
 
   .switcher button.active {
@@ -221,9 +400,9 @@
   }
 
   .floor-label {
-      text-align: center;
-      font-family: "Prata", serif;
-    margin: 0 0 clamp(14px, 3vw, 20px);
+    text-align: center;
+    font-family: "Prata", serif;
+    margin-bottom: 20px;
     color: rgba(178, 152, 126, 1);
     font-size: 16px;
   }
@@ -249,18 +428,35 @@
   .activity-image {
     width: 104px;
     height: 104px;
-    border-radius: 22px;
+    border-radius: 24px;
     overflow: hidden;
-      padding: 4px;
-      border: 1px solid rgba(178, 152, 126, 1);
+    padding: 4px;
+    border: 1px solid rgba(178, 152, 126, 1);
+    /* 4. Добавляем position relative, чтобы оверлей позиционировался относительно картинки */
+    position: relative;
   }
 
   .activity-image img {
     width: 100%;
     height: 100%;
-      border-radius: 22px;
+    border-radius: 22px;
     object-fit: cover;
     display: block;
+  }
+
+  .completed-overlay {
+    position: absolute;
+    top: 4px; /* Учитываем padding родителя */
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    background: rgba(178, 152, 126, 0.6); /* Полупрозрачный акцентный цвет */
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    backdrop-filter: blur(1px); /* Опционально: легкое размытие */
   }
 
   .activity-copy {
@@ -273,17 +469,17 @@
     margin: 0;
     font-size: 18px;
     font-weight: 400;
-      font-family: "Prata", serif;
+    font-family: "Prata", serif;
     color: rgba(24, 22, 15, 1);
     line-height: 1.3;
   }
 
   .activity-desc {
     margin: 0;
-    font-size: 14px;
-      font-weight: 400;
-    color: rgba(24, 22, 15, 0.72);
-    line-height: 1.35;
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(24, 22, 15, 1);
+    line-height: 1.25;
   }
 
   .map-image {

@@ -350,7 +350,7 @@ function initSceneObjects() {
   .dim-layer {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.55); /* Сила затемнения */
+    background: rgba(0, 0, 0, 0.23); /* Сила затемнения */
     z-index: 2;
     pointer-events: none; /* Пропускает клики сквозь себя на канвас */
   }

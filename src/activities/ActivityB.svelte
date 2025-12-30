@@ -1,50 +1,87 @@
 <script>
+  import { onMount } from "svelte";
+  import { fade } from "svelte/transition";
+  import "../styles/fonts.css";
   import { router, routes } from "../router";
   import ActivityShell from "../components/ActivityShell.svelte";
   import { memories } from "./memories";
   import { getArtifactForActivity } from "../data/artifacts";
   import CameraCatch from "./CameraCatch.svelte";
   import Modal from "../components/Modal.svelte";
-  import AudioWithCaptions from "../components/AudioWithCaptions.svelte";
+  import VideoWithSubtitles from "../components/VideoWithSubtitles.svelte";
+  import SoundButton from "../components/SoundButton.svelte";
+  import { settings } from "../stores/settings";  
 
   const steps = { INTRO: "INTRO", CATCH: "CATCH", DETAIL: "DETAIL" };
   let step = steps.INTRO;
+  
+  // Состояние загрузки
+  let isLoading = false;
 
-const intro = {
+  const videoConfig = {
+    ios: {
+      src: "/activityB/Letters_mov_HEVC.mov",
+      timings: [3.5, 7.2, 10.5],
+    },
+    default: {
+      src: "/activityB/Comp_webm_VP9_alpha.webm",
+      timings: [3.4, 7.1, 10.5],
+    },
+  };
+
+  let currentOverlay = videoConfig.default;
+
+  const isIOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  if (isIOS) {
+    currentOverlay = videoConfig.ios;
+  } else {
+    currentOverlay = videoConfig.default;
+  }
+
+  const intro = {
     title: "Приветственный адрес Поленову от учеников",
     description:
       "Документ, в котором звучат голоса учеников Василия Дмитриевича. В 1895 году, прощаясь с преподавателем, они написали ему приветственный адрес — слова благодарности",
-    imageUrl: "/activityB/background.png",
+    imageUrl: "/activityB/preview_image.png",
     imageAlt: "Приветственный адрес Поленову от учеников",
+    mapSvg: "/activityB/floor-map.svg",
     floorLabel: "1 этаж",
-    buttonText: "Начать",
+    buttonText: "Начать"
   };
 
   const guide = {
     buttonText: "Далее",
-    audio: {
-      src: "/activityB/6947c3f2c84c4900013533c0_tts2_result.mp3",
-      captions: [
-        {
-          t: 0,
-          text:
-            "В XIX веке наша Академия называлась Московским училищем живописи, ваяния и зодчества. Здесь Поленов преподавал 13 лет."
-        },
-        {
-          t: 1,
-          text:
-            "Этот приветственный адрес ученики подарили Василию Дмитриевичу, когда он покидал должность преподавателя. Для них это было прощанием с эпохой."
-        },
-        {
-          t: 2,
-          text:
-            "Поленов говорил, что научить ремеслу легко. Труднее — дать таланту раскрыться. Но именно это он и делал, и его влияние сложно переоценить."
-        },
-      ],
+    video: {
+      src: "/activityB/guide_in.webm",
+      subtitles: "/activityB/guide_in.srt",
+      poster: "/images/1.png",
+      aspectRatio: "9 / 16",
       autoplay: true,
+      loop: false,
+      controls: false,
+      subtitlesLabel: "Субтитры",
+      subtitlesLang: "ru",
     },
   };
-  
+
+  const outro = {
+    buttonText: "Далее",
+    video: {
+      src: "/activityB/guide_out.webm",
+      subtitles: "/activityB/guide_out.srt",
+      poster: "/images/1.png",
+      aspectRatio: "9 / 16",
+      autoplay: true,
+      loop: false,
+      controls: false,
+      subtitlesLabel: "Субтитры",
+      subtitlesLang: "ru",
+    },
+  };
+
   const catchMemories = memories.slice(0, 3);
 
   let caughtMemories = [];
@@ -53,10 +90,35 @@ const intro = {
   let isMuted = false;
   let pageFlipAudio;
 
+  let currentSubtitle = "";
+  let fullTextFromSRT = "";
+  let videoWillBeStarting = true;
+
   $: detailMemo =
     step === steps.DETAIL
       ? (caughtMemories[detailIdx] ?? catchMemories[detailIdx])
       : null;
+
+  onMount(async () => {
+    /*
+    const assetsToLoad = [
+      "/activityB/preview_image.png",
+      "/activityB/floor-map.svg"
+    ];
+
+    try {
+      await Promise.all(assetsToLoad.map(async (src) => {
+        const response = await fetch(src);
+        if (!response.ok) throw new Error(`Failed to load ${src}`);
+        await response.blob(); 
+      }));
+    } catch (e) {
+      console.warn("Ошибка предзагрузки (продолжаем работу):", e);
+    } finally {
+      isLoading = false;
+    }
+      */
+  });
 
   function startCatch() {
     step = steps.CATCH;
@@ -73,6 +135,9 @@ const intro = {
     detailIdx = 0;
     isMuted = false;
     detailModalOpen = false;
+    currentSubtitle = ""; 
+    fullTextFromSRT = "";
+    videoWillBeStarting = true;
     step = steps.DETAIL;
   }
 
@@ -82,19 +147,22 @@ const intro = {
     pageFlipAudio.play?.().catch(() => {});
   }
 
-  function nextDetail() {
+  function nextDetail(outro) {
     if (detailIdx < caughtMemories.length - 1) {
       detailIdx += 1;
       isMuted = false;
       detailModalOpen = false;
+      currentSubtitle = "";
+      fullTextFromSRT = "";
+      videoWillBeStarting = true;
       playPageFlip();
     } else {
-      finish();
+      outro(finish);
     }
   }
 
-  function toggleMute() {
-    isMuted = !isMuted;
+  function handleSoundTap() {
+    settings.update((s) => ({ ...s, audioEnabled: !s.audioEnabled }));
   }
 
   function finish() {
@@ -103,127 +171,195 @@ const intro = {
   }
 </script>
 
-<ActivityShell {intro} {guide}>
-  <div class="safe activityB">
-    {#if step === steps.INTRO}
-      <div class="permissionScreen">
-        <div class="permissionCard">
-          <div class="permissionTitle">Разрешить доступ к камере?</div>
-          <div class="permissionSubtitle">
-            Доступ необходим для работы дополненной реальности
-          </div>
+<svelte:head>
+  {#if step === steps.INTRO}
+    <link rel="preload" as="fetch" href={guide.video.src} type="video/webm" crossorigin />
+  {/if}
 
-          <div class="permissionBtns">
-            <button class="btn-cancel" type="button" on:click={finish}
-              >Отмена</button
-            >
-            <button class="btn-allow" type="button" on:click={startCatch}
-              >Разрешить</button
-            >
-          </div>
-        </div>
-      </div>
-    {/if}
-
-    <CameraCatch
-      running={step === steps.CATCH}
-      memories={catchMemories}
-      overlaySrc="/activityB/overlay.mp4"
-      maxSlots={3}
-      on:catch={handleCatch}
-      on:complete={handleCatchComplete}
-      on:error={(event) => console.error("Camera error", event.detail)}
+  {#if step !== steps.DETAIL}
+    <link 
+      rel="preload" 
+      as="fetch" 
+      href={currentOverlay.src} 
+      type={isIOS ? "video/quicktime" : "video/webm"} 
+      crossorigin
     />
+  {/if}
+</svelte:head>
 
-    {#if step === steps.DETAIL && detailMemo}
-      <div class="detailScreen">
-        <header class="detailHeader">
-          <div class="detailBrand">
-            <img src="/icons/check.svg" alt="" aria-hidden="true" />
-            <span class="divider"></span>
-            <img src="/icons/arc.svg" alt="" aria-hidden="true" />
-          </div>
-          <button
-            class="soundToggle"
-            type="button"
-            on:click={toggleMute}
-            aria-label="Переключить звук"
-          >
-            {#if isMuted}
-              <img src="/icons/sound-off.svg" alt="Звук выкл" />
-            {:else}
-              <img src="/icons/sound-on.svg" alt="Звук вкл" />
-            {/if}
-          </button>
-        </header>
-
-        <div class="detailTitle">
-          <div class="detailName">{detailMemo.name}</div>
-          <div class="detailRole">{detailMemo.role}</div>
-        </div>
-
-        <div class="mediaFrame">
-          {#if detailMemo.videoUrl}
-            <video
-              src={detailMemo.videoUrl}
-              autoplay
-              loop
-              playsinline
-              muted
-              poster={detailMemo.portraitUrl}
-            ></video>
-          {:else if detailMemo.portraitUrl}
-            <img
-              src={detailMemo.portraitUrl}
-              alt={`Портрет ${detailMemo.name}`}
-            />
-          {/if}
-        </div>
-
-        <div class="detailExcerpt">{detailMemo.excerpt}</div>
-
-        <div class="detailButtons">
-          <button
-            class="btn-outline"
-            type="button"
-            on:click={() => (detailModalOpen = true)}
-          >
-            Читать полностью
-          </button>
-
-          <button class="btn-primary" type="button" on:click={nextDetail}>
-            {detailIdx < caughtMemories.length - 1
-              ? "Следующее воспоминание"
-              : "Завершить активность"}
-          </button>
-        </div>
-
-        <div class="audioLayer">
-          <AudioWithCaptions
-            src={detailMemo.audioUrl}
-            captions={detailMemo.captions}
-            autoplay={true}
-            muted={isMuted}
-          />
-        </div>
-
-        <Modal
-          open={detailModalOpen}
-          title={detailMemo.name}
-          onClose={() => (detailModalOpen = false)}
-        >
-          <div class="modalRole">{detailMemo.role}</div>
-          <div class="modalText">{detailMemo.fullText}</div>
-        </Modal>
-      </div>
-    {/if}
+{#if isLoading}
+  <!-- Экран загрузки -->
+  <div class="loading-screen" out:fade={{ duration: 500 }}>
+    <div class="spinner"></div>
+    <div class="loading-text">Загрузка материалов...</div>
   </div>
-</ActivityShell>
+{:else}
+  <!-- Основной контент появляется плавно -->
+  <div class="content-wrapper" in:fade={{ duration: 500 }}>
+    <ActivityShell let:next {intro} {guide} {outro}>
+      <div class="safe activityB">
+        {#if step === steps.INTRO}
+          <div class="permissionScreen" transition:fade={{ duration: 300 }}>
+            <div class="permissionCard">
+              <div class="permissionTitle">Разрешить доступ к камере?</div>
+              <div class="permissionSubtitle">
+                Доступ необходим для работы дополненной реальности
+              </div>
+
+              <div class="permissionBtns">
+                <button class="btn-cancel" type="button" on:click={finish}
+                  >Отмена</button
+                >
+                <button class="btn-allow" type="button" on:click={startCatch}
+                  >Разрешить</button
+                >
+              </div>
+            </div>
+          </div>
+        {/if}
+
+        {#if step === steps.CATCH || (step === steps.DETAIL && detailMemo)}
+          <header class="top-container">
+            <div class="logo-group">
+              <span class="logo logo-white" aria-hidden="true"></span>
+            </div>
+
+            <SoundButton isMuted={!$settings.audioEnabled} onTap={handleSoundTap} />
+          </header>
+        {/if}
+
+        <CameraCatch
+          running={step === steps.CATCH || step === steps.DETAIL}
+          showUI={step === steps.CATCH}
+          memories={catchMemories}
+          overlaySrc={currentOverlay.src}
+          stopTimings={currentOverlay.timings}
+          maxSlots={3}
+          on:catch={handleCatch}
+          on:complete={handleCatchComplete}
+          on:error={(event) => console.error("Camera error", event.detail)}
+        />
+
+        {#if step === steps.DETAIL && detailMemo}
+          <div class="detailScreen" transition:fade={{ duration: 400 }}>
+            <div class="detailTitle">
+              <div class="detailName">{detailMemo.name}</div>
+            </div>
+
+            <div class="mediaFrame">
+              <VideoWithSubtitles
+                src={isIOS ? detailMemo.videoUrlMov : detailMemo.videoUrl}
+                subtitlesSrc={detailMemo.srtUrl}
+                autoplay={true}
+                muted={!$settings.audioEnabled}
+                loop={false}
+                onSubtitleUpdate={(text) => {
+                  if (videoWillBeStarting) {
+                    setTimeout(() => {
+                      currentSubtitle = text;
+                      videoWillBeStarting = false;
+                    }, 800);
+                  } else {
+                    currentSubtitle = text;
+                  }
+                }}
+                onCaptionsLoaded={(text) => {
+                  fullTextFromSRT = text;          
+                }}
+              />
+            </div>
+
+            <div class="audioLayer">
+              {#if currentSubtitle}
+                <div class="captions">
+                  {@html currentSubtitle}
+                </div>
+              {/if}
+
+              <button
+                class="captionsTap"
+                type="button"
+                aria-label="Читать полную версию воспоминания"
+                on:click={() => (detailModalOpen = true)}
+              ></button>
+            </div>
+
+            <Modal
+              open={detailModalOpen}
+              title={detailMemo.name}
+              fullscreen
+              onClose={() => (detailModalOpen = false)}
+            >
+              <div class="modalRole">{detailMemo.role}</div>
+              <div class="modalText">
+                {fullTextFromSRT || "Текст загружается..."}
+              </div>
+            </Modal>
+
+            <div class="detailButtons">
+              <button class="btn-primary" type="button" on:click={() => nextDetail(next)}>
+                {detailIdx < caughtMemories.length - 1
+                  ? "Следующее воспоминание"
+                  : "Далее"}
+              </button>
+            </div>
+          </div>
+        {/if}
+      </div>
+    </ActivityShell>
+  </div>
+{/if}
 
 <style>
+  .loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: url("/onboarding/background1.jpg") center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #1f130a;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(179, 135, 101, 0.3);
+    border-radius: 50%;
+    border-top-color: #b38765;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 16px;
+  }
+
+  .loading-text {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: #1f130a;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .content-wrapper {
+    height: 100%;
+    width: 100%;
+  }
+
   .activityB {
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overscroll-behavior: none;
     height: 100dvh;
+    min-height: 100svh; 
+    
+    overflow: hidden;
+    background: url("/onboarding/background1.jpg") center/cover no-repeat;
   }
 
   .permissionScreen {
@@ -232,6 +368,8 @@ const intro = {
     align-items: center;
     justify-content: center;
     padding: 24px;
+    position: relative; 
+    z-index: 80;
   }
 
   .permissionCard {
@@ -270,13 +408,14 @@ const intro = {
     border-radius: 999px;
     padding: 14px 0;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 500;
     border: 0;
     cursor: pointer;
   }
 
   .btn-cancel {
-    background: #f5ede5;
+    border: 1px solid #a3876c !important;
+    background: transparent;
     color: #a3876c;
   }
 
@@ -285,123 +424,70 @@ const intro = {
     color: #fff;
   }
 
-  .detailScreen {
-    position: fixed;
-    inset: 0;
-    padding: 32px 22px calc(env(safe-area-inset-bottom, 16px) + 32px);
-    background: radial-gradient(circle at top, #1c150f 0%, #050302 70%);
-    color: #f8f5f1;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    z-index: 80;
-    font-family: "Cormorant Garamond", serif;
-  }
-
-  .detailHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .detailBrand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .detailBrand img {
-    width: 30px;
-    height: 30px;
-  }
-
-  .detailBrand .divider {
-    width: 1px;
-    height: 26px;
-    background: rgba(255, 255, 255, 0.25);
-  }
-
-  .soundToggle {
-    width: 44px;
-    height: 44px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    background: rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .soundToggle img {
-    width: 22px;
-    height: 22px;
-  }
-
   .detailTitle {
     text-align: left;
+    margin-bottom: 16px;
+    margin-top: 16px;
   }
 
-  .detailName {
-    font-size: clamp(24px, 7vw, 36px);
-    font-weight: 600;
+  .activityB .detailName {
+    font-family: Prata;
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 120%;
+    color:rgb(255, 252, 248);
   }
 
-  .detailRole {
-    margin-top: 4px;
-    font-family: "Inter", sans-serif;
-    font-size: 13px;
-    letter-spacing: 0.2px;
-    color: rgba(248, 245, 241, 0.7);
-  }
-
-  .mediaFrame {
+  :global(.activityB .mediaFrame) {
     border-radius: 28px;
     overflow: hidden;
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
-  }
-
-  .mediaFrame video,
-  .mediaFrame img {
-    width: 100%;
+    box-shadow: none;
+    height: 50vh;
+    background: transparent;
+    position: relative;
     display: block;
+    margin-top: auto;
+    margin-bottom: auto;
   }
 
-  .detailExcerpt {
-    font-family: "Inter", sans-serif;
-    font-size: 16px;
-    line-height: 1.35;
-    color: rgba(248, 245, 241, 0.88);
+  .activityB .mediaFrame :global(> *) {
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .activityB .mediaFrame :global(video) {
+    width: 100% !important;
+    height: 100% !important;
+    height: 50vh;
+    object-fit: cover !important; 
+    background: transparent !important;
+    display: block;
+    margin-top: auto;
+    margin-bottom: auto;
   }
 
   .detailButtons {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-top: auto;
   }
 
-  .detailButtons .btn-outline,
   .detailButtons .btn-primary {
     border-radius: 999px;
     padding: 16px;
     font-size: 16px;
-    font-weight: 600;
-  }
-
-  .btn-outline {
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    background: transparent;
-    color: inherit;
+    font-weight: 500;
   }
 
   .btn-primary {
     background: #fdf6ea;
     color: #1f130a;
     border: none;
-  }
-
-  .audioLayer {
-    position: relative;
-    height: 0;
   }
 
   .modalRole {
@@ -415,5 +501,81 @@ const intro = {
     white-space: pre-wrap;
     font-size: 15px;
     line-height: 1.4;
+  }
+
+  .activityB .audioLayer {
+    position: relative;
+    margin-top: 0px;
+    min-height: 20vh;
+    display: flex;
+  }
+
+  .detailScreen {
+    position: absolute;
+    top: 60px;
+    width: 92vw;
+    height: calc(100dvh - 80px);
+    display: flex;
+    flex-direction: column;
+    z-index: 70; 
+  }
+
+  .activityB :global(.video-wrapper-inner video) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain !important;
+    background: transparent !important;
+    display: block;
+  }
+
+  .activityB .captions {
+    width: min(520px, 90vw);
+    padding: 12px 16px;
+    margin-top: auto;
+    margin-bottom: 15px;
+    color: rgba(254, 254, 252, 0.96);
+    pointer-events: none;
+    z-index: 5;
+    font-family: Inter;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 124%;
+    text-align: center;
+    color: var(--txt-white);
+  }
+
+  .captionsTap {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(520px, 90vw);
+    height: 100%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    z-index: 6;
+  }
+
+  .top-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    padding: 0 clamp(2px, 1vw, 4px);
+  }
+
+  .logo-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo {
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
   }
 </style>

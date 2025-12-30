@@ -1,56 +1,98 @@
 <script>
-  import { onDestroy } from "svelte";
+  import "../styles/fonts.css";
+  import { onMount, onDestroy } from "svelte";
 
-  export let src;
-  export let captions = []; // [{t, text}]
-  export let autoplay = true;
-  export let muted = false;
+   let {
+    src,
+    captions = [], // [{t, text}]
+    autoplay = true,
+    muted = false,
+  } = $props();
 
-  let audio;
-  let current = "";
+  let audio = $state(null);
+  let current = $state("");
 
-  let raf;
-  function tick() {
+  function updateCaptions() {
     if (!audio) return;
+    
     const t = audio.currentTime || 0;
-
-    // находим последнюю caption где caption.t <= t
+    
     let text = "";
     for (let i = 0; i < captions.length; i++) {
       if (captions[i].t <= t) text = captions[i].text;
       else break;
     }
+    
     current = text;
-    raf = requestAnimationFrame(tick);
   }
 
-  function startLoop() {
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(tick);
+  function removeEventListeners() {
+    audio.removeEventListener('timeupdate', updateCaptions);
+    audio.removeEventListener('seeked', updateCaptions);
+    audio.removeEventListener('playing', updateCaptions);
+    audio.removeEventListener('loadedmetadata', updateCaptions);
+    audio.removeEventListener('loadeddata', updateCaptions);
+    audio.removeEventListener('play', updateCaptions);
+    audio.removeEventListener('volumechange', updateCaptions);
   }
 
-  function stopLoop() {
-    cancelAnimationFrame(raf);
-  }
-
-  $: if (audio && src) {
-    console.log("Audio changed! : " + src);
-
-    // при смене трека
-    audio.pause();
-    audio.currentTime = 0;
-    audio.src = src;
-    audio.muted = muted;
-
-    if (autoplay) {
-      audio.play().catch(() => {
-        console.log("Audio autoplay disabled");
-      });
+  onMount(() => {
+    if (!audio) {
+      return;
     }
-    startLoop();
-  }
+    
+    audio.addEventListener('timeupdate', updateCaptions);
+    audio.addEventListener('seeked', updateCaptions);
+    audio.addEventListener('playing', updateCaptions);
+    audio.addEventListener('loadedmetadata', updateCaptions);
+    audio.addEventListener('loadeddata', updateCaptions);
+    audio.addEventListener('play', updateCaptions);
+    audio.addEventListener('volumechange', updateCaptions);
+    
+    return removeEventListeners;
+  });
 
-  onDestroy(() => stopLoop());
+  $effect(() => {
+    if (audio) {
+      audio.muted = muted;
+      updateCaptions();
+    }
+  });
+
+  $effect(() => {
+    if (audio && src) {
+      const wasPlaying = !audio.paused;
+      
+      audio.pause();
+      audio.src = src;
+      audio.currentTime = 0;
+
+      if (autoplay || wasPlaying) {
+        queueMicrotask(() => {
+          audio.play().catch((err) => {
+            console.log("Audio play failed:", err.message);
+          });
+        });
+      }
+      
+      updateCaptions();
+    }
+  });
+
+  $effect(() => {
+    if (audio) {
+      updateCaptions();
+    } else {
+      current = "";
+    }
+  });
+
+  onDestroy(() => {
+    if (audio) {
+      audio.pause();
+    }
+    removeEventListeners();
+  });
 </script>
 
 <audio bind:this={audio} playsinline></audio>
@@ -73,5 +115,6 @@
     font-size: 18px;
     font-family: "Inter", sans-serif;
     backdrop-filter: none;
+    pointer-events: none;
   }
 </style>

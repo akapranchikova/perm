@@ -12,9 +12,11 @@
         alt = "",
         maxScale = 3,
         minScale = 0.5,
-        maxWrongTapsCount = 3,        
+        maxWrongTapsCount = 3,
+        specialAreaSideToOriginalSideRatio = 0.125, 
         onRightBottomTap = () => {},
         onMaxWrongTaps = () => {},
+        onFirstTap = () => {}
     } = $props();
 
     let ui = $state({
@@ -45,6 +47,8 @@
 
         effectiveContainerWidth: 0,
         effectiveContainerHeight: 0,
+
+        firstTapWasOccurred: false
     });
 
     let container;
@@ -76,13 +80,10 @@
             return;
         }
 
-        const centerX = ui.imageNaturalWidth / 2;
-        const centerY = ui.imageNaturalHeight / 2;
-
-        ui.specialAreaX = centerX;
-        ui.specialAreaY = centerY;
-        ui.specialAreaWidth = ui.imageNaturalWidth - centerX;
-        ui.specialAreaHeight = ui.imageNaturalHeight - centerY;
+        ui.specialAreaWidth = specialAreaSideToOriginalSideRatio * ui.imageNaturalWidth;
+        ui.specialAreaHeight = specialAreaSideToOriginalSideRatio * ui.imageNaturalHeight;
+        ui.specialAreaX = ui.imageNaturalWidth - ui.specialAreaWidth;
+        ui.specialAreaY = ui.imageNaturalHeight - ui.specialAreaHeight;
     }
 
     function updateContainerSize() {
@@ -154,6 +155,15 @@
         ui.translateY = Math.max(ui.minTranslateY, Math.min(ui.maxTranslateY, ui.translateY));
     }
 
+    function checkFirstTap() {
+        if (!ui.firstTapWasOccurred) {
+            ui.firstTapWasOccurred = true;
+            if (onFirstTap) {
+                onFirstTap();
+            }
+        }
+    }
+
     /**
      * @param {TouchEvent} event
      */
@@ -184,6 +194,8 @@
         } else if (event.touches.length === 1 && ui.scale > ui.initialScale) {
             isDragging = true;
         }
+
+        checkFirstTap();
     }
 
     /**
@@ -301,6 +313,8 @@
         startX = event.clientX;
         startY = event.clientY;
         startTime = Date.now();
+
+        checkFirstTap();
     }
     
     /**
@@ -357,9 +371,6 @@
         
         event.preventDefault();
         
-        const delta = Math.sign(event.deltaY) > 0
-            ? MOUSE_WHEEL_ZOOM_MIN_DELTA
-            : -MOUSE_WHEEL_ZOOM_MIN_DELTA;
         const zoomFactor = 1 - event.deltaY * MOUSE_WHEEL_ZOOM_SPEED;
         
         const containerRect = container.getBoundingClientRect();
@@ -379,6 +390,8 @@
         ui.translateX = mouseX - relativeX * ui.scale;
         ui.translateY = mouseY - relativeY * ui.scale;
         updateBoundaries();
+
+        checkFirstTap();
     }
     
     /**
@@ -387,6 +400,7 @@
     function handleMouseClick(event) {
         if (!isMouseDragging) {
             handleTap(event.clientX, event.clientY);
+            checkFirstTap();
         }
     }
 

@@ -1,52 +1,91 @@
 <script>
+  import '../styles/app.css';
   import { router, routes } from "../router";
   import { quizC } from "./quizC";
   import ActivityShell from "../components/ActivityShell.svelte";
   import ActivityGuideIntro from "../components/ActivityGuideIntro.svelte";
+  import SoundButton from "../components/SoundButton.svelte";
+  import GuideCircleVideo from "../components/GuideCircleVideo.svelte";
   import { getArtifactForActivity } from "../data/artifacts";
+  import { settings } from "../stores/settings";
 
   const stages = /** @type {const} */ ({
-    STORY: "STORY",
+    INTRO: "INTRO",
     QUESTION: "QUESTION",
-    GUIDE: "GUIDE",
+    FEEDBACK: "FEEDBACK",
+    FINAL_GUIDE: "FINAL_GUIDE",
   });
 
-  let stage = stages.STORY;
-  let storyIndex = 0;
+  // Начинаем с интро, если оно есть, иначе сразу с вопроса
+  let stage = quizC.intro ? stages.INTRO : stages.QUESTION;
+  
+  let currentRoundIndex = 0;
   let selectedIndex = null;
+  let isLastAnswerCorrect = false;
   let answers = [];
+  let bubbleText = "";
 
-  $: totalQuestions = quizC.questions.length;
-  $: currentQuestionIndex = Math.min(storyIndex, totalQuestions - 1);
-  $: questionNumber = currentQuestionIndex + 1;
-  $: currentStory = quizC.stories[storyIndex];
-  $: currentQuestion = quizC.questions[currentQuestionIndex];
-  $: hasQuestionAfterStory = storyIndex < totalQuestions;
+  // Вычисляемые свойства
+  $: totalRounds = quizC.rounds.length;
+  $: currentRound = quizC.rounds[currentRoundIndex];
+  
+  // Определяем данные для текущего экрана (Интро или Фидбек)
+  $: currentFeedbackData = stage === stages.INTRO 
+      ? quizC.intro 
+      : (isLastAnswerCorrect ? currentRound.feedbackCorrect : currentRound.feedbackIncorrect);
 
-  function goNextFromStory() {
-    if (hasQuestionAfterStory) {
-      selectedIndex = null;
+  $: guideVideoIsMuted = !$settings.audioEnabled;
+  $: questionNumber = currentRoundIndex + 1;
+
+  // Переход от Интро или Фидбека к следующему шагу
+  function goNext() {
+    if (stage === stages.INTRO) {
       stage = stages.QUESTION;
-    } else {
-      stage = stages.GUIDE;
+      return;
+    }
+
+    if (stage === stages.FEEDBACK) {
+      // Сбрасываем выбор
+      selectedIndex = null;
+      bubbleText = "";
+      
+      if (currentRoundIndex < totalRounds - 1) {
+        currentRoundIndex++;
+        stage = stages.QUESTION;
+      } else {
+        stage = stages.FINAL_GUIDE;
+      }
     }
   }
 
+  // Обработка выбора ответа
   function chooseAnswer(i) {
-    if (selectedIndex !== null) return; // блок повторного выбора
+    if (selectedIndex !== null) return; // блокируем повторный клик
     selectedIndex = i;
 
-    const correct = i === currentQuestion.correctIndex;
+    const correct = i === currentRound.correctIndex;
+    isLastAnswerCorrect = correct;
+
     answers = [
       ...answers,
-      { qId: currentQuestion.id, selectedIndex: i, correct },
+      { qId: currentRound.id, selectedIndex: i, correct },
     ];
 
+    // Небольшая задержка перед показом реакции, чтобы пользователь увидел свой выбор
     setTimeout(() => {
-      storyIndex = Math.min(storyIndex + 1, quizC.stories.length - 1);
-      stage = stages.STORY;
-      selectedIndex = null;
+      stage = stages.FEEDBACK;
     }, 450);
+  }
+
+  function handleGuideVideoSoundTap() {
+    settings.update((s) => ({ ...s, audioEnabled: !s.audioEnabled }));
+  }
+
+  function handleGuideVideoLoad() {
+  }
+
+  function handleGuideSubtitleChange(event) {
+    bubbleText = event?.detail?.text?.trim() ?? "";
   }
 
   function finish() {
@@ -54,81 +93,110 @@
     router.go(routes.ARTIFACT_REWARD, { artifactId: artifact?.id });
   }
 
-  const intro = {
+  const introData = {
     title: "Музыкальная рукопись «Анна Бретонская»",
     subtitle: "Василий Поленов",
     description:
       "Поленов очень любил историю о герцогине Анне Бретонской, написанную на французском. Художник перевел рассказ и написал пьесу, а позже – детскую оперу",
-    imageUrl: "/painting.png",
+    imageUrl: "/activityC/preview_image.png",
     imageAlt: "Музыкальная рукопись «Анна Бретонская»",
+    mapSvg: "/activityC/floor-map.svg",
     floorLabel: "1 этаж",
     buttonText: "Начать",
   };
+
+  const guide = {
+    buttonText: "Далее",
+    video: {
+      src: "/activityC/guide_in.webm",
+      subtitles: "/activityC/guide_in.srt",
+      poster: "/images/gigachat.png",
+      aspectRatio: "9 / 16",
+      autoplay: true,
+      loop: false,
+      controls: false,
+      subtitlesLabel: "Субтитры",
+      subtitlesLang: "ru",
+    }
+  };
 </script>
 
-<ActivityShell {intro}>
-  {#if stage === stages.GUIDE}
+<ActivityShell intro={introData} {guide}>
+  {#if stage === stages.FINAL_GUIDE}
     <ActivityGuideIntro
-      audio={quizC.finalGuide?.audio}
+      video={quizC.finalGuide?.video}
       buttonText={quizC.finalGuide?.buttonText ?? "Далее"}
       onNext={finish}
     />
   {:else}
     <div class="safe quiz">
       <div class="topbar">
-      <div class="logo-group" aria-label="Поленов и Сбер">
-          <span class="logo {stage === stages.QUESTION || stage === stages.STORY ? 'logo-brown' : 'logo-white'} " aria-hidden="true"></span>
+        <div class="logo-group" aria-label="Поленов и Сбер">
+          <span class="logo {stage === stages.QUESTION ? 'logo-brown' : 'logo-white'} " aria-hidden="true"></span>
         </div>
-
-        <button class="sound-btn sound-btn--light" type="button" aria-label="Звук">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 5V19L7 15H4C3.73478 15 3.48043 14.8946 3.29289 14.7071C3.10536 14.5196 3 14.2652 3 14V10C3 9.73478 3.10536 9.48043 3.29289 9.29289C3.48043 9.10536 3.73478 9 4 9H7L11 5Z" stroke="#B2987E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M18.3599 5.64062C20.0453 7.32813 20.9919 9.61562 20.9919 12.0006C20.9919 14.3856 20.0453 16.6731 18.3599 18.3606" stroke="#B2987E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M15.54 8.46094C16.0057 8.92539 16.3751 9.47715 16.6272 10.0846C16.8792 10.6921 17.009 11.3433 17.009 12.0009C17.009 12.6586 16.8792 13.3098 16.6272 13.9173C16.3751 14.5247 16.0057 15.0765 15.54 15.5409" stroke="#B2987E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </button>
+        {#if stage === stages.INTRO || stage === stages.FEEDBACK}
+          <SoundButton
+            cssClass={stage === stages.QUESTION ? 'sound-brown' : 'sound-white'}
+            isMuted={!$settings.audioEnabled}
+            onTap={handleGuideVideoSoundTap} />
+        {/if}
       </div>
 
-      {#if stage === stages.STORY}
+      <!-- Блок с Гидом (Интро или Реакция на ответ) -->
+      {#if stage === stages.INTRO || stage === stages.FEEDBACK}
         <div class="quote">
-          <img class="avatar" src={quizC.avatarUrl} alt="" />
+          <GuideCircleVideo
+            src={currentFeedbackData.guideVideoSrc}
+            subtitlesSrc={currentFeedbackData.guideSubtitlesSrc}
+            isMuted={guideVideoIsMuted}
+            autoplay={true}
+            isLooped={false}
+            onLoad={handleGuideVideoLoad}
+            on:subtitlechange={handleGuideSubtitleChange}
+            cssClass="guide-circle-video"
+          />
           <div class="bubble">
-            <!--{#each currentStory.lines as line}-->
-            <!--  <div class="bubbleText">{line}</div>-->
-            <!--{/each}-->
-              <div class="bubbleText">{currentStory.lines.join(' ')}</div>
+            <div class="bubbleText">
+              {bubbleText || "..."}
+            </div>
           </div>
         </div>
 
         <div class="storyBody">
           <div class="mediaCard">
             <div class="media">
-              <img src={currentStory.videoUrl} alt={currentStory.videoAlt} />
-              <div class="play" aria-hidden="true">
-                  <svg width="104" height="104" viewBox="0 0 104 104" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M0 5.70975C0 2.55875 2.55875 0 5.70975 0H97.7903C100.941 0 103.5 2.55875 103.5 5.70975V97.7903C103.498 99.3041 102.896 100.756 101.826 101.826C100.756 102.896 99.3041 103.498 97.7903 103.5H5.70975C4.19543 103.5 2.74313 102.898 1.67235 101.828C0.601561 100.757 0 99.3046 0 97.7903V5.70975ZM43.8265 31.1362C43.4804 30.9054 43.0782 30.7727 42.6627 30.7523C42.2472 30.7319 41.834 30.8246 41.467 31.0205C41.1 31.2163 40.793 31.5081 40.5787 31.8647C40.3644 32.2212 40.2508 32.6292 40.25 33.0452V70.4548C40.2508 70.8708 40.3644 71.2788 40.5787 71.6353C40.793 71.9919 41.1 72.2837 41.467 72.4795C41.834 72.6754 42.2472 72.7681 42.6627 72.7477C43.0782 72.7273 43.4804 72.5946 43.8265 72.3637L71.8808 53.6647C72.1962 53.4548 72.4549 53.1701 72.6339 52.8361C72.8129 52.5021 72.9065 52.129 72.9065 51.75C72.9065 51.371 72.8129 50.9979 72.6339 50.6639C72.4549 50.3299 72.1962 50.0452 71.8808 49.8353L43.8265 31.1362Z" fill="#E5DCDC" fill-opacity="0.44"/>
-                  </svg>
-              </div>
+              <!-- Используем mainVideoUrl из текущего фидбека или интро -->
+              {#if currentFeedbackData.videoUrl || currentFeedbackData.mainVideoUrl}
+                 <video 
+                    muted 
+                    autoplay 
+                    loop
+                    class="video" 
+                    src={currentFeedbackData.videoUrl || currentFeedbackData.mainVideoUrl} 
+                    alt={currentFeedbackData.videoAlt || ""} 
+                 />
+              {/if}
             </div>
           </div>
 
           <div class="ctaRow">
-            <button class="outline-btn" type="button" on:click={goNextFromStory}>
+            <button class="outline-btn" type="button" on:click={goNext}>
               Далее
             </button>
           </div>
         </div>
       {/if}
 
+      <!-- Блок с Вопросом -->
       {#if stage === stages.QUESTION}
           <div class="question-body">
               <div class="question">
                   <div class="questionNumber">Вопрос {questionNumber}</div>
-                  <div class="questionTitle">{currentQuestion.prompt}</div>
+                  <div class="questionTitle">{currentRound.prompt}</div>
               </div>
 
               <div class="answers">
-                  {#each currentQuestion.answers as a, i}
+                  {#each currentRound.answers as a, i}
                       <button
                               type="button"
                               class="answerBtn"
@@ -141,7 +209,6 @@
                   {/each}
               </div>
           </div>
-
       {/if}
     </div>
   {/if}
@@ -151,8 +218,10 @@
       position: relative;
       height: 100dvh;
       display: flex;
+      overflow: hidden;
       flex-direction: column;
       gap: 14px;
+      overscroll-behavior: none;
       background: linear-gradient(180deg, #fefcf8 0%, #fefefc 60%, #fff 100%);
       color: var(--text-primary);
     }
@@ -194,7 +263,7 @@
 
     .mediaCard {
       flex: 1;
-        margin: 0 -20px;
+      margin: 0 -20px;
       display: flex;
       align-items: stretch;
       justify-content: center;
@@ -207,19 +276,11 @@
       width: 100%;
     }
 
-    .media img {
+    .media video {
       width: 100%;
       height: 100%;
       display: block;
       object-fit: cover;
-    }
-
-    .play {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .ctaRow {
@@ -307,6 +368,27 @@
     .answerBtn.selected {
       border-color: rgba(178, 152, 126, 0.9);
       background: rgba(178, 152, 126, 0.1);
+    }
+
+    .sound-brown {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .sound-white {
+      color: var(--bg-muted);
+    }
+
+    :global(.guide-circle-video) {
+      width: 58px;
+      height: 58px;
+      object-fit: cover;
+      flex: 0 0 auto;
+    }
+
+    .video{
+      width: 100%;
+      height: 100%;
     }
 
     @media (max-width: 390px) {
