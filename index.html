@@ -64,6 +64,44 @@
           { passive: false }
       );
   </script>
+  <script>
+    const configureVideoPlayback = (video) => {
+      if (!(video instanceof HTMLVideoElement)) return;
+
+      video.muted = true;
+      video.playsInline = true;
+      video.autoplay = true;
+      video.loop = true;
+
+      const playAttempt = video.play();
+      if (playAttempt && typeof playAttempt.catch === "function") {
+        playAttempt.catch(() => {
+          // Autoplay might be blocked until user interaction.
+        });
+      }
+    };
+
+    const applyToExistingVideos = () => {
+      document.querySelectorAll("video").forEach(configureVideoPlayback);
+    };
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node instanceof HTMLVideoElement) {
+            configureVideoPlayback(node);
+          } else if (node instanceof HTMLElement) {
+            node.querySelectorAll?.("video").forEach(configureVideoPlayback);
+          }
+        });
+      });
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      applyToExistingVideos();
+      observer.observe(document.body, { childList: true, subtree: true });
+    });
+  </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/105888770" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
   </body>
 </html>
