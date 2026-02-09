@@ -11,6 +11,7 @@ import {
 import { AppState, RenderCleanup } from './types'
 import { resolvePointIndexFromLocation } from './qr'
 
+// Centralized app state used across all screens
 const soundEnabled = loadSoundEnabled()
 const onboardingCompleted = loadOnboardingCompleted()
 const deepLinkPointIndex = resolvePointIndexFromLocation(window.location)

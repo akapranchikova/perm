@@ -2,6 +2,8 @@ import { points } from './data'
 
 const ALLOWED_HOSTS = new Set(['permgal.4app.pro', 'localhost', '127.0.0.1', '0.0.0.0'])
 
+// Map of known aggregator URL suffixes to zero-based point indices.
+// Add new entries via RoutePoint.qrSuffix in data.ts.
 const AGGREGATOR_SUFFIX_TO_POINT = new Map<string, number>(
   points
     .map<[string, number] | null>((point, index) =>

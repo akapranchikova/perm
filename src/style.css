@@ -886,7 +886,7 @@ main,
     z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .card__content--options .header {
@@ -897,7 +897,7 @@ main,
     font-size: 28px;
     color: #ffffff;
     margin: 0;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
 }
 
 .card--options p {
@@ -3008,6 +3008,9 @@ main,
 }
 
 @media (max-width: 420px) {
+    .option-grid {
+        gap: 10px;
+    }
     .card--onboarding .card__image.golos {
         width: 184px;
         height: 184px;

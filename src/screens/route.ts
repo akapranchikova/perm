@@ -17,6 +17,7 @@ function setupImages(container: HTMLElement): void {
     )
 
     images.forEach((img) => {
+        // Безопасные дефолты для UX/производительности.
         img.loading = 'lazy'
         img.decoding = 'async'
         if (!img.alt || img.alt.trim() === '') {
@@ -47,18 +48,24 @@ function setupImages(container: HTMLElement): void {
         img.addEventListener('load', onLoad)
         img.addEventListener('error', onError)
 
+        // Современный способ: декодируем, чтобы избежать «мигания».
+        // Важно: если decode не поддерживается — упадём на проверку complete.
         if ('decode' in img && typeof img.decode === 'function') {
+            // Не await: мы не блокируем рендер, просто помечаем когда готово.
             img
                 .decode()
                 .then(() => {
+                    // Если в процессе не случилась ошибка загрузки, помечаем.
                     if (img.complete && img.naturalWidth > 0) markLoaded()
                 })
                 .catch(() => {
+                    // decode может падать на некоторых браузерах — fallback.
                     if (img.complete) {
                         img.naturalWidth > 0 ? markLoaded() : markError()
                     }
                 })
         } else {
+            // Старые движки: мгновенная проверка.
             if (img.complete) {
                 img.naturalWidth > 0 ? markLoaded() : markError()
             }
@@ -84,6 +91,7 @@ export const renderRouteList = (): HTMLElement => {
         .map((point, index) => {
             const image = timelineImages[index % timelineImages.length]
             const viewed = viewedPoints.has(point.id)
+            // const alt = point.photoAlt || \`Маршрутная точка \${index + 1}\`
             return `
             <article class="route-card" data-index="${index}">
             <div class="route-card__indicator">
@@ -129,6 +137,7 @@ export const renderRouteList = (): HTMLElement => {
     </div>
   `
 
+    // Привязка кликов по карточкам.
     container.querySelectorAll<HTMLElement>('.route-card').forEach((item) => {
         item.addEventListener('click', () => {
             const index = Number(item.dataset.index)
@@ -139,6 +148,7 @@ export const renderRouteList = (): HTMLElement => {
         })
     })
 
+    // CTA
     const cta = createButton('Пройти маршрут с Гидом')
     cta.addEventListener('click', () => {
         state.routeMode = 'guide'

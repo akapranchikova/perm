@@ -369,7 +369,7 @@ export const renderOnboardingSlide = (): RenderResult => {
         onAdvance: goNext, // кнопка "Далее" ведёт туда же
     })
 
-    // свайпы как в сторис
+    // ✅ свайпы как в сторис
     const detachSwipe = attachSwipeNavigation(element, goNext, goPrev)
 
     return {
@@ -640,6 +640,8 @@ export const renderGuideIntro = (): RenderResult => {
         isSubtitleAnimatingOut = false
     }
 
+    // Hide the current subtitle line. If there is nothing visible, clear state immediately;
+    // otherwise play the hide animation and reset when it ends.
     const hideSubtitle = () => {
         console.log('hideeee')
         if (!(subtitleText.textContent || '').trim().length) {

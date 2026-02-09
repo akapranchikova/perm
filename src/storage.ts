@@ -6,6 +6,7 @@ const CAMERA_PERMISSION_KEY = 'gallery-camera-permission-granted'
 const NEXT_POINT_HINTS_KEY = 'gallery-next-point-hints'
 const CONTENT_GESTURE_HINT_KEY = 'gallery-content-gesture-hint'
 
+// Responsible for persisting which points were already viewed by the visitor
 export const loadViewed = (): Set<string> => {
   const stored = localStorage.getItem(STORAGE_KEY)
   if (!stored) return new Set()

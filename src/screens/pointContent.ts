@@ -84,6 +84,9 @@ const waitCanPlay = (m: HTMLMediaElement) =>
         try { m.load() } catch {}
     })
 
+const waitCanPlayWithTimeout = (m: HTMLMediaElement, timeoutMs = 500) =>
+    Promise.race([waitCanPlay(m), new Promise<void>((resolve) => window.setTimeout(resolve, timeoutMs))])
+
 const playWhenReady = (media: HTMLMediaElement) => {
     const tryPlay = () => media.play().catch(() => {})
     if (media.readyState >= 2) { tryPlay(); return }
@@ -92,6 +95,7 @@ const playWhenReady = (media: HTMLMediaElement) => {
     try { media.load() } catch {}
 }
 
+// why: iOS требует «живого» play() до размута
 const playAudioWithIOSAutoplayHack = (audio: HTMLAudioElement, wantSound: boolean) => {
     const prevMuted = audio.muted
     const prevVolume = audio.volume
@@ -109,6 +113,25 @@ const playAudioWithIOSAutoplayHack = (audio: HTMLAudioElement, wantSound: boolea
         audio.muted = !wantSound
         audio.volume = wantSound ? prevVolume || 1 : 0
     }, 250)
+}
+
+const ensureVideoPlaying = async (
+    video: HTMLVideoElement,
+    session: number,
+    maxAttempts = 3
+) => {
+    const started = () => (!video.paused && !video.ended) || video.currentTime > 0.05
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        if (session !== playSession) return
+        video.play().catch(() => {})
+        await waitFirstVideoFrameOrTimeout(video, 350 + attempt * 100)
+        if (session !== playSession) return
+        if (started()) return
+        try { video.pause() } catch {}
+        try { video.currentTime = 0 } catch {}
+        try { video.load() } catch {}
+        await new Promise((r) => setTimeout(r, 120 * attempt))
+    }
 }
 
 const ensureAudioPlaying = async (
@@ -155,9 +178,9 @@ const startAVTogether = async (
     video.muted = true
     video.defaultMuted = true
 
-    await Promise.all([waitCanPlay(video), waitCanPlay(audio)])
-
+    await waitCanPlay(video)
     video.play().catch(() => {})
+    await waitCanPlayWithTimeout(audio, 500)
     const curSession = playSession
     ensureAudioPlaying(audio, wantSound, curSession).catch(() => {})
     await waitFirstVideoFrameOrTimeout(video, 400)
@@ -316,7 +339,7 @@ const renderVideoSection = (section: VideoContent) => {
         const audio = document.createElement('audio')
         audio.className = 'content-video__audio'
         audio.controls = false
-        audio.preload = 'auto'
+        audio.preload = 'auto' // why: уменьшаем окна гонок
         audio.setAttribute('playsinline', '')
         audio.src = section.audio
         if (section.subtitlesUrl) {
@@ -335,8 +358,9 @@ const warmupMediaInPanel = (panel?: HTMLElement | null) => {
     if (!panel) return
     const videos = Array.from(panel.querySelectorAll('video')) as HTMLVideoElement[]
     const audios = Array.from(panel.querySelectorAll('audio')) as HTMLAudioElement[]
-    videos.forEach((v) => { try { v.preload = 'metadata'; if (v.readyState === 0) v.load() } catch {} })
-    audios.forEach((a) => { try { a.preload = 'metadata'; if (a.readyState === 0) a.load() } catch {} })
+    const preloadMode = panel.classList.contains('is-active') ? 'auto' : 'metadata'
+    videos.forEach((v) => { try { v.preload = preloadMode; if (v.readyState === 0) v.load() } catch {} })
+    audios.forEach((a) => { try { a.preload = preloadMode; if (a.readyState === 0) a.load() } catch {} })
 }
 
 const renderSection = (section: PointContentSection) => {
@@ -474,7 +498,11 @@ export const renderPointContent = () => {
             }
             if (!isActive) {
                 media.pause()
-                if (media instanceof HTMLAudioElement) { try { media.currentTime = 0 } catch {} }
+                if (media instanceof HTMLVideoElement) {
+                    resetVideo(media)
+                } else {
+                    try { media.currentTime = 0 } catch {}
+                }
             }
         })
 
@@ -490,9 +518,8 @@ export const renderPointContent = () => {
             autoplayTimeoutId = window.setTimeout(async () => {
                 if (session !== playSession) return
                 try {
-                    await waitCanPlay(activeVideo)
-                    activeVideo.play().catch(() => {})
-                    await ensureAudioPlaying(activeAudio, !isMuted, session)
+                    await startAVTogether(activeVideo, activeAudio, !isMuted)
+                    await ensureVideoPlaying(activeVideo, session)
                 } catch {}
             }, 0)
         } else if (activeVideo) {
@@ -500,7 +527,7 @@ export const renderPointContent = () => {
                 if (session !== playSession) return
                 try {
                     await waitCanPlay(activeVideo)
-                    activeVideo.play().catch(() => {})
+                    await ensureVideoPlaying(activeVideo, session)
                 } catch {}
             }, 0)
         } else if (activeAudio) {
@@ -520,6 +547,7 @@ export const renderPointContent = () => {
         Array.from(slider.querySelectorAll('[data-dot]')).forEach((dot, index) => {
             dot.classList.toggle('is-active', index === state.currentContentIndex)
         })
+        warmupMediaInPanel(stack.children[state.currentContentIndex] as HTMLElement | undefined)
         warmupAround(state.currentContentIndex)
         syncMediaState()
     }
@@ -932,6 +960,7 @@ export const renderPointContent = () => {
     renderHint()
     container.appendChild(hint)
 
+    // Разлочка на первый жест
     const getActiveAudioElSafe = () => {
         const a = getActiveAudioEl()
         return a?.currentSrc || a?.src || undefined
@@ -997,6 +1026,7 @@ export const renderPointContent = () => {
         const isClearlyVertical = Math.abs(deltaY) > Math.abs(deltaX) * 1.15
 
         if (deltaY < -SWIPE_THRESHOLD && state.currentContentIndex < config.sections.length - 1) {
+            // вверх — как раньше
             goToContentIndex(state.currentContentIndex + 1)
         } else if (
             deltaY > downThreshold &&                    // нужен «тяжёлый» жест вниз
@@ -1031,7 +1061,17 @@ export const renderPointContent = () => {
     document.addEventListener('visibilitychange', onVisibility)
     cleanupCallbacks.push(() => document.removeEventListener('visibilitychange', onVisibility))
 
-    const cleanup = () => { cleanupCallbacks.forEach((fn) => fn()) }
+    const cleanup = () => {
+        mediaElements.forEach((media) => {
+            try { media.pause() } catch {}
+            if (media instanceof HTMLVideoElement) {
+                resetVideo(media)
+            } else {
+                try { media.currentTime = 0 } catch {}
+            }
+        })
+        cleanupCallbacks.forEach((fn) => fn())
+    }
     return { element: container, cleanup }
 }
 

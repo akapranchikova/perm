@@ -38,8 +38,10 @@ export const prefetchToObjectUrl = (url: string, kind: MediaKind) => {
     const p = new Promise<string>((resolve, reject) => {
         run(async () => {
             try {
+                // subs обычно маленькие — можно просто text() (но blob тоже ок)
                 const res = await fetch(url, {
                     signal: ctrl.signal,
+                    // credentials: 'same-origin', // включи если нужно
                     cache: 'force-cache',
                 })
 
