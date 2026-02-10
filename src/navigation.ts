@@ -1,4 +1,6 @@
-import {state} from "./state";
+import { points } from './data'
+import { saveAppState } from './storage'
+import { state } from './state'
 
 let renderFn: (() => void) | null = null
 
@@ -9,6 +11,15 @@ export const setRenderer = (fn: () => void) => {
 
 // Trigger a rerender from inside screen event handlers
 export const rerender = () => {
-    ym(105888770, 'hit', state.screen);
+  ym(105888770, 'hit', state.screen)
+  const storyId = points[state.currentPointIndex]?.id ?? null
+  saveAppState({
+    storyId,
+    screenId: state.screen,
+    step: state.currentContentIndex,
+    contentIndex: state.currentContentIndex,
+    slideIndex: state.slideIndex,
+    routeMode: state.routeMode,
+  })
   renderFn?.()
 }

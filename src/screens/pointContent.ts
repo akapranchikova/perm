@@ -3,7 +3,7 @@
 import { pointContentConfigs, points } from '../data'
 import { rerender } from '../navigation'
 import { state } from '../state'
-import { saveContentGestureHintCompleted, saveSoundEnabled } from '../storage'
+import { saveAppState, saveContentGestureHintCompleted, saveSoundEnabled } from '../storage'
 import { loadSrtSubtitles, SubtitleCue, createCueFromText } from '../subtitles'
 import { AudioContent, CardsContent, ModelsContent, PointContentSection, VideoContent } from '../types'
 import { navigateToNextPoint } from './pointFlow'
@@ -40,18 +40,22 @@ const isFromCards = (event: TouchEvent) => {
 let audioAutoplayUnlocked = false
 let isGestureOverlayVisible = false
 
-const unlockAudioPlaybackOnce = (probeSrc?: string) => {
+const unlockAudioPlaybackOnce = async (audio: HTMLAudioElement) => {
     if (audioAutoplayUnlocked) return
-    if (!probeSrc) { audioAutoplayUnlocked = true; return }
-    const probe = new Audio()
-    probe.src = probeSrc
-    probe.muted = true
-    probe.volume = 0
-    ;(probe as any).playsInline = true
-    probe.setAttribute?.('playsinline', '')
-    probe.play()
-        .then(() => { try { probe.pause() } catch {} audioAutoplayUnlocked = true })
-        .catch(() => { /* игнор */ })
+    try {
+        const prevMuted = audio.muted
+        const prevVol = audio.volume
+        audio.muted = true
+        audio.volume = 0
+        await audio.play()
+        audio.pause()
+        audio.currentTime = 0
+        audio.muted = prevMuted
+        audio.volume = prevVol
+        audioAutoplayUnlocked = true
+    } catch {
+        // без жеста может быть заблокировано — это ок
+    }
 }
 
 // Ждём первый кадр или таймаут — не блокируем аудио
@@ -471,6 +475,14 @@ export const renderPointContent = () => {
             : activePanel?.querySelector('audio')) as HTMLAudioElement | null
     }
 
+    const getActivePanel = () =>
+        stack.children[state.currentContentIndex] as HTMLElement | undefined
+
+    const getActiveVideoEl = () => {
+        const p = getActivePanel()
+        return (p?.querySelector('video.content-video') as HTMLVideoElement | null) ?? null
+    }
+
     const resetVideo = (v: HTMLVideoElement) => {
         try { v.pause() } catch {}
         try { v.currentTime = 0 } catch {}
@@ -506,7 +518,8 @@ export const renderPointContent = () => {
             }
         })
 
-        const activeVideo = activePanel?.querySelector('video.content-video') as HTMLVideoElement | null
+        const activeVideo = getActiveVideoEl() as HTMLVideoElement | null
+
         const activeAudio = isModelPanel
             ? (activePanel?.querySelector('.content-model.is-active audio') as HTMLAudioElement | null)
             : (activePanel?.querySelector('audio.content-video__audio, audio') as HTMLAudioElement | null)
@@ -600,6 +613,15 @@ export const renderPointContent = () => {
         prevPanel?.querySelectorAll('video').forEach((v) => resetVideo(v as HTMLVideoElement))
         prevPanel?.querySelectorAll('audio').forEach((a) => { const el = a as HTMLAudioElement; try { el.pause() } catch {}; try { el.currentTime = 0 } catch {} })
         state.currentContentIndex = clampIndex(nextIndex)
+        const storyId = points[state.currentPointIndex]?.id ?? null
+        saveAppState({
+            storyId,
+            screenId: state.screen,
+            step: state.currentContentIndex,
+            contentIndex: state.currentContentIndex,
+            slideIndex: state.slideIndex,
+            routeMode: state.routeMode,
+        })
         updateHeaderForIndex(state.currentContentIndex)
         updateActive()
         renderHint()
@@ -633,7 +655,32 @@ export const renderPointContent = () => {
         soundToggle = document.createElement('button')
         soundToggle.type = 'button'
         soundToggle.className = 'button primary icon-button'
-        soundToggle.addEventListener('click', () => setMuted(!isMuted))
+        soundToggle.addEventListener('click', async () => {
+            const turningSoundOn = isMuted
+
+            setMuted(!isMuted)
+
+            // ВАЖНО: если включаем звук — делаем unlock+play СРАЗУ внутри клика
+            if (turningSoundOn) {
+                const a = getActiveAudioEl()
+                const v = getActiveVideoEl()
+
+                if (a) {
+                    await unlockAudioPlaybackOnce(a)
+                    a.muted = false
+                    a.volume = 1
+                    try { await a.play() } catch {}
+                }
+
+                // если есть видео — пускай крутится (оно и так muted)
+                if (v) {
+                    try { await v.play() } catch {}
+                }
+
+                // синхронизация состояния после “живого” play()
+                syncMediaState()
+            }
+        })
         const isLast = state.currentContentIndex >= config.sections.length - 1
         if (isLast) {
             hint.classList.add('content-hint--final')
@@ -680,6 +727,117 @@ export const renderPointContent = () => {
     updateHeaderForIndex(state.currentContentIndex)
     updateActive()
     syncSubtitlesForActivePanel()
+
+    const tryAutoUnlockAudio = () => {
+        if (isMuted) return
+        const activeAudio = getActiveAudioEl()
+        if (activeAudio) {
+            unlockAudioPlaybackOnce(activeAudio)
+            audioAutoplayUnlocked = true
+        }
+        window.setTimeout(() => {
+            if (audioAutoplayUnlocked) {
+                syncMediaState()
+            }
+        }, 120)
+    }
+
+    const resumePlaybackFromGesture = () => {
+        const activeAudio = getActiveAudioEl()
+        const activeVideo = getActiveVideoEl()
+
+        // видео всегда можно стартануть (оно muted)
+        if (activeVideo) {
+            try { activeVideo.play().catch(() => {}) } catch {}
+        }
+
+        if (!activeAudio) return
+
+        // ВАЖНО: реальные play() должны быть синхронно внутри жеста
+        try { activeAudio.load() } catch {}
+
+        if (isMuted) {
+            // звук выключен — просто разлочим движок “тихим” play
+            unlockAudioPlaybackOnce(activeAudio)
+            return
+        }
+
+        // звук включен — пытаемся стартануть со звуком прямо сейчас
+        activeAudio.muted = false
+        activeAudio.volume = 1
+
+        // iOS/строгие браузеры: сначала “живой” muted play, затем restore
+        playAudioWithIOSAutoplayHack(activeAudio, true)
+
+        // и дубль обычным play (часто помогает на десктопах)
+        try { activeAudio.play().catch(() => {}) } catch {}
+    }
+
+    // If the page was reloaded on a media screen, browsers may block sound until user interaction.
+    // Retry audio playback after the first interaction to restore sound reliably.
+    const resumeAudioAfterInteraction = async () => {
+        // убери: if (isMuted) return
+        const activeAudio = getActiveAudioEl()
+        const activeVideo = getActiveVideoEl()
+
+        if (activeAudio) {
+            await unlockAudioPlaybackOnce(activeAudio)
+            audioAutoplayUnlocked = true
+        }
+
+        // НЕ включаем звук насильно, просто разлочим движок
+        syncMediaState()
+    }
+    container.addEventListener('pointerdown', () => {
+        resumePlaybackFromGesture()
+        // после жестового старта можно синхронизировать стейт (уже не критично)
+        syncMediaState()
+    }, { once: true })
+    tryAutoUnlockAudio()
+
+    let autoplayRetryId: number | null = null
+    const startAutoplayRetry = () => {
+        if (autoplayRetryId !== null || isMuted) return
+        let attempts = 0
+        autoplayRetryId = window.setInterval(() => {
+            attempts += 1
+            const activeAudio = getActiveAudioEl()
+            const activeVideo = getActiveVideoEl();
+            if (!activeAudio) {
+                if (attempts >= 10 && autoplayRetryId !== null) {
+                    window.clearInterval(autoplayRetryId)
+                    autoplayRetryId = null
+                }
+                return
+            }
+            if (!activeAudio.paused || activeAudio.currentTime > 0) {
+                if (autoplayRetryId !== null) {
+                    window.clearInterval(autoplayRetryId)
+                    autoplayRetryId = null
+                }
+                return
+            }
+            if (activeAudio) {
+                unlockAudioPlaybackOnce(activeAudio)
+                audioAutoplayUnlocked = true
+            }
+            if (activeVideo) {
+                startAVTogether(activeVideo, activeAudio, true).catch(() => {})
+            } else {
+                playAudioWithIOSAutoplayHack(activeAudio, true)
+            }
+            if (attempts >= 10 && autoplayRetryId !== null) {
+                window.clearInterval(autoplayRetryId)
+                autoplayRetryId = null
+            }
+        }, 500)
+    }
+    startAutoplayRetry()
+    cleanupCallbacks.push(() => {
+        if (autoplayRetryId !== null) {
+            window.clearInterval(autoplayRetryId)
+        }
+    })
 
     if (!isFinalPoint) { container.appendChild(header) }
     container.appendChild(slider)
@@ -967,7 +1125,8 @@ export const renderPointContent = () => {
     }
 
     const gestureHintCleanup = maybeShowGestureHint(container, () => {
-        unlockAudioPlaybackOnce(getActiveAudioElSafe())
+        // это вызывается внутри touchend overlay = user gesture
+        resumePlaybackFromGesture()
         syncMediaState()
     })
     if (gestureHintCleanup) cleanupCallbacks.push(gestureHintCleanup)
@@ -976,7 +1135,11 @@ export const renderPointContent = () => {
     const tryUnlockOnTouchStart = () => {
         if (audioUnlockTried) return
         audioUnlockTried = true
-        unlockAudioPlaybackOnce(getActiveAudioElSafe())
+        const audio = getActiveAudioEl();
+        if (audio) {
+            unlockAudioPlaybackOnce(audio);
+        }
+        audioAutoplayUnlocked = true
         syncMediaState()
     }
 

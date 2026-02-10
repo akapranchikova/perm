@@ -1,6 +1,13 @@
 import { onboardingSlides } from '../data'
 import { rerender } from '../navigation'
-import { getFirstUnviewedPointIndex, isRouteCompleted, resetProgress, state } from '../state'
+import {
+    applyNavigationTarget,
+    clearDeepLinkParam,
+    getFirstUnviewedPointIndex,
+    isRouteCompleted,
+    resetProgress,
+    state,
+} from '../state'
 import { saveOnboardingCompleted, saveSoundEnabled } from '../storage'
 import { createButton } from '../ui'
 import { RenderResult } from '../types'
@@ -382,19 +389,11 @@ export const renderOnboardingSlide = (): RenderResult => {
 
 export const renderHeadphonesPrompt = (): RenderResult => {
     const goNext = () => {
-        if (state.deepLinkPointIndex !== null) {
-            if (getFirstUnviewedPointIndex() === 0) {
-                state.currentContentIndex = 0
-                state.deepLinkPointIndex = null
-                state.deepLinkRequiresHeadphones = false
-                state.screen = 'routeModePrompt'
-                rerender()
-                return;
-            }
-            state.screen = 'pointContent'
-            state.currentContentIndex = getFirstUnviewedPointIndex()
-            state.deepLinkPointIndex = null
-            state.deepLinkRequiresHeadphones = false
+        const pendingTarget = state.pendingNavigationTarget
+        if (pendingTarget?.source === 'deeplink') {
+            applyNavigationTarget(pendingTarget)
+            state.pendingNavigationTarget = null
+            clearDeepLinkParam(pendingTarget.paramKey)
             rerender()
             return
         }

@@ -75,13 +75,38 @@ export interface AppState {
   currentContentIndex: number
   soundEnabled: boolean
   onboardingCompleted: boolean
-  deepLinkPointIndex: number | null
-  deepLinkRequiresHeadphones: boolean
   scannerExpectedPointIndex: number | null
   scannerOrigin: AppScreen | null
   cameraPermissionGranted: boolean
   nextPointHintsCompleted: boolean
   contentGestureHintCompleted: boolean
+  pendingNavigationTarget: NavigationTarget | null
+}
+
+export type DeepLinkParamKey = 'period' | 'storyId' | 'pointId'
+
+export interface DeepLinkTarget {
+  pointIndex: number
+  paramKey: DeepLinkParamKey
+}
+
+export interface NavigationTarget {
+  source: 'deeplink' | 'restore'
+  screenId: AppScreen
+  pointIndex?: number
+  contentIndex?: number
+  slideIndex?: number
+  routeMode?: 'guide' | 'solo'
+  paramKey?: DeepLinkParamKey
+}
+
+export interface AppStateSnapshot {
+  storyId: string | null
+  screenId: AppScreen
+  step?: number
+  contentIndex?: number
+  slideIndex?: number
+  routeMode?: 'guide' | 'solo'
 }
 
 export type PointContentKind = 'video' | 'cards' | 'audio' | 'models'

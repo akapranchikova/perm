@@ -34,15 +34,6 @@ export const renderLoader = (): RenderResult => {
   `
 
   const timeoutId = window.setTimeout(() => {
-    if (state.deepLinkPointIndex !== null && !state.deepLinkRequiresHeadphones) {
-      state.screen = 'pointContent'
-      state.currentContentIndex = 0
-      state.deepLinkPointIndex = null
-      state.deepLinkRequiresHeadphones = false
-      rerender()
-      return
-    }
-
     const shouldSkipIntro = state.onboardingCompleted
     state.screen = shouldSkipIntro ? 'onboardingPrompt' : 'onboardingSlide'
     rerender()
